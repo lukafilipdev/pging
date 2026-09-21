@@ -48,6 +48,10 @@ button {
   font-family: var(--font-archivo), Helvetica, sans-serif;
 }
 
+.font-display {
+  font-family: var(--font-display), Helvetica, sans-serif;
+}
+
 .font-barlow-condensed {
   font-family: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
 }
@@ -81,24 +85,12 @@ button {
   }
 }
 
-@keyframes pgBob {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.75;
-  }
-  50% {
-    transform: translateY(9px);
-    opacity: 1;
-  }
-}
-
 @keyframes pgBurns {
   from {
-    transform: scale(1.06) translate3d(0, 0, 0);
+    transform: scale(1) translate3d(0, 0, 0);
   }
   to {
-    transform: scale(1.16) translate3d(-1.5%, -1%, 0);
+    transform: scale(1.02) translate3d(-0.6%, -0.4%, 0);
   }
 }
 

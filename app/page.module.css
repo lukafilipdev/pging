@@ -18,7 +18,7 @@
 }
 
 @media (max-width: 480px) {
-  .phoneBtn {
+  .headerCta {
     display: none;
   }
   .logoImg {
@@ -30,64 +30,103 @@
 }
 
 .navLink {
+  position: relative;
   color: var(--link-color);
-  transition: color 0.5s ease;
+  transition: color 0.4s ease;
 }
 
 .navLink:hover {
   color: var(--accent-light);
 }
 
-.phoneBtn {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+.headerCta {
+  color: var(--cta-color);
+  border: 1px solid var(--cta-border);
+  transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
 }
 
-.phoneBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(232, 116, 36, 0.3);
-  color: #fff;
-}
-
-.ctaPrimary {
-  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s ease;
-}
-
-.ctaPrimary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 38px rgba(232, 116, 36, 0.4);
-  color: #fff;
-}
-
-.ctaSecondary {
-  transition: background 0.35s ease, border-color 0.35s ease;
-}
-
-.ctaSecondary:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: #fff;
-  color: #fff;
-}
-
-.scrollHint {
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.scrollHint:hover {
+.headerCta:hover {
+  border-color: var(--accent);
   color: var(--accent-light);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ctaArrow {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.headerCta:hover .ctaArrow {
+  transform: translateX(4px);
+}
+
+.scrollCueTrack {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 26px;
+  background: rgba(255, 255, 255, 0.22);
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.scrollCueDot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  transform: translate(-50%, 0);
+  animation: pgScrollCue 2.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.scrollCue:hover .scrollCueTrack {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+@keyframes pgScrollCue {
+  0% {
+    transform: translate(-50%, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 25px);
+    opacity: 0;
+  }
+}
+
+.heroIndexBox {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(10, 8, 6, 0.42);
+  backdrop-filter: blur(6px);
+  border-radius: 4px;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.heroIndexBox:hover {
+  border-color: var(--accent);
+  background: rgba(20, 16, 12, 0.6);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 900px) {
+  .heroMarkCardWrap {
+    display: none !important;
+  }
 }
 
 .aboutSection {
   background: #fff;
   position: relative;
   overflow: hidden;
-}
-
-@media (min-width: 900px) {
-  .aboutSection {
-    max-height: 100svh;
-    display: flex;
-    align-items: center;
-  }
 }
 
 .aboutGrid {
@@ -101,6 +140,7 @@
 @media (min-width: 900px) {
   .aboutGrid {
     grid-template-columns: 1.15fr 0.85fr;
+    align-items: stretch;
   }
 }
 
@@ -130,16 +170,15 @@
   position: relative;
   overflow: hidden;
   border-radius: 2px;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 16 / 11;
   box-shadow: 0 30px 60px -30px rgba(38, 35, 31, 0.4);
 }
 
-.aboutImageFrame img {
-  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.aboutImageFrame:hover img {
-  transform: scale(1.045);
+@media (min-width: 900px) {
+  .aboutImageFrame {
+    position: sticky;
+    top: 96px;
+  }
 }
 
 .serviceCard {

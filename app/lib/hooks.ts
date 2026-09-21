@@ -77,51 +77,29 @@ export function useHeaderSolid(heroRef: RefObject<HTMLElement | null>) {
   return solid;
 }
 
-export function useScrollProgress() {
-  const [progress, setProgress] = useState(0);
+export function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0] ?? "");
 
   useEffect(() => {
-    let raf = 0;
-    const compute = () => {
-      const el = document.documentElement;
-      const height = el.scrollHeight - el.clientHeight;
-      setProgress(height > 0 ? Math.min(1, Math.max(0, el.scrollTop / height)) : 0);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(compute);
-    };
-    compute();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+    if (!els.length || !("IntersectionObserver" in window)) return;
 
-  return progress;
-}
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ids.join(",")]);
 
-export function useHeroParallax(
-  heroRef: RefObject<HTMLElement | null>,
-  imgRef: RefObject<HTMLImageElement | null>
-) {
-  useEffect(() => {
-    const hero = heroRef.current;
-    const img = imgRef.current;
-    if (!hero || !img) return;
-    const onScroll = () => {
-      const y = window.scrollY || 0;
-      if (!window.matchMedia("(pointer: coarse)").matches && y < hero.offsetHeight) {
-        img.style.translate = "0 " + (y * 0.16).toFixed(1) + "px";
-      }
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [heroRef, imgRef]);
+  return active;
 }
 
 export function useParallaxDrift(imgRef: RefObject<HTMLImageElement | null>, strength = 60) {
@@ -151,37 +129,4 @@ export function useParallaxDrift(imgRef: RefObject<HTMLImageElement | null>, str
 
 export function useQuoteParallax(imgRef: RefObject<HTMLImageElement | null>) {
   useParallaxDrift(imgRef, 60);
-}
-
-export function useSectionProgress(sectionRef: RefObject<HTMLElement | null>) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    let raf = 0;
-    const compute = () => {
-      const r = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const start = vh * 0.85;
-      const end = vh * 0.3;
-      const span = r.height + (start - end);
-      const traveled = start - r.top;
-      setProgress(span > 0 ? Math.min(1, Math.max(0, traveled / span)) : 0);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(compute);
-    };
-    compute();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [sectionRef]);
-
-  return progress;
 }

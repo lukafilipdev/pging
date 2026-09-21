@@ -1,17 +1,10 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type FormEvent, type CSSProperties } from "react";
 import styles from "./page.module.css";
 import { heroMarks, principles, services, steps } from "./lib/data";
-import {
-  useHeaderSolid,
-  useHeroParallax,
-  useParallaxDrift,
-  useQuoteParallax,
-  useReveal,
-  useScrollProgress,
-  useSectionProgress,
-} from "./lib/hooks";
+import { useActiveSection, useHeaderSolid, useQuoteParallax, useReveal } from "./lib/hooks";
+import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
 
 function Reveal({
   children,
@@ -35,20 +28,63 @@ export default function Home() {
   const [sent, setSent] = useState(false);
 
   const heroRef = useRef<HTMLElement>(null);
-  const heroImgRef = useRef<HTMLImageElement>(null);
+  const heroBgWrapRef = useRef<HTMLDivElement>(null);
+  const heroContentRef = useRef<HTMLDivElement>(null);
   const quoteImgRef = useRef<HTMLImageElement>(null);
+  const quoteSectionRef = useRef<HTMLElement>(null);
+  const quoteHeadingRef = useRef<HTMLDivElement>(null);
+  const aboutSectionRef = useRef<HTMLElement>(null);
   const aboutImgRef = useRef<HTMLImageElement>(null);
+  const aboutVignetteRef = useRef<HTMLDivElement>(null);
+  const principleDividerRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const serviceRowRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const serviceLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stepsContainerRef = useRef<HTMLDivElement>(null);
+  const stepsBarRef = useRef<HTMLDivElement>(null);
+  const stepDotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const stepNumRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const contactSectionRef = useRef<HTMLElement>(null);
+  const contactCardRef = useRef<HTMLDivElement>(null);
+  const contactGlowRef = useRef<HTMLDivElement>(null);
+  const topBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
 
   const solid = useHeaderSolid(heroRef);
-  const topProgress = useScrollProgress();
-  useHeroParallax(heroRef, heroImgRef);
+  const activeSection = useActiveSection(["top", "o-podjetju", "storitve", "kontakt"]);
   useQuoteParallax(quoteImgRef);
-  useParallaxDrift(aboutImgRef, 36);
-  const stepsProgress = useSectionProgress(stepsContainerRef);
+
+  const fxRefs: ScrollFxRefs = {
+    topBar: topBarRef,
+    heroSection: heroRef,
+    heroBgWrap: heroBgWrapRef,
+    heroContent: heroContentRef,
+    aboutSection: aboutSectionRef,
+    aboutImg: aboutImgRef,
+    aboutVignette: aboutVignetteRef,
+    principleDividers: principleDividerRefs,
+    quoteSection: quoteSectionRef,
+    quoteHeading: quoteHeadingRef,
+    serviceRows: serviceRowRefs,
+    serviceLines: serviceLineRefs,
+    stepsContainer: stepsContainerRef,
+    stepsBar: stepsBarRef,
+    stepDots: stepDotRefs,
+    stepNums: stepNumRefs,
+    contactCard: contactCardRef,
+    contactGlow: contactGlowRef,
+    contactSection: contactSectionRef,
+  };
+  useScrollFx(fxRefs);
 
   const linkColor = solid ? "#4a453f" : "#fff";
-  const inkLabelColor = solid ? "rgba(38,35,31,.62)" : "rgba(255,255,255,.82)";
+  const inkLabelColor = solid ? "rgba(38,35,31,.62)" : "rgba(255,255,255,.95)";
+  const headerTextShadow = solid ? "none" : "0 1px 8px rgba(0,0,0,.4)";
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -58,9 +94,16 @@ export default function Home() {
   const containerStyle: CSSProperties = {
     maxWidth: 2100,
     margin: "0 auto",
-    paddingLeft: "clamp(16px,2.4vw,48px)",
-    paddingRight: "clamp(16px,2.4vw,48px)",
+    paddingLeft: "clamp(24px,5vw,110px)",
+    paddingRight: "clamp(24px,5vw,110px)",
   };
+
+  const navItems = [
+    { href: "#top", label: "Domov" },
+    { href: "#o-podjetju", label: "O podjetju" },
+    { href: "#storitve", label: "Storitve" },
+    { href: "#kontakt", label: "Kontakt" },
+  ];
 
   return (
     <div style={{ width: "100%", overflowX: "hidden" }}>
@@ -76,10 +119,13 @@ export default function Home() {
         }}
       >
         <div
+          ref={topBarRef}
           style={{
             height: "100%",
-            width: `${topProgress * 100}%`,
+            width: "100%",
             background: "var(--accent)",
+            transform: "scaleX(0)",
+            transformOrigin: "left center",
           }}
         />
       </div>
@@ -108,7 +154,7 @@ export default function Home() {
         >
           <a href="#top" style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
             <img
-              src="/uploads/logo.png"
+              src={solid ? "/uploads/logo.png" : "/uploads/logo-white.png"}
               alt="PG Inženiring"
               className={styles.logoImg}
               style={{
@@ -127,6 +173,7 @@ export default function Home() {
                 color: inkLabelColor,
                 textTransform: "uppercase",
                 lineHeight: 1.2,
+                textShadow: headerTextShadow,
                 transition: "color .5s ease",
               }}
             >
@@ -135,47 +182,78 @@ export default function Home() {
               d.o.o.
             </span>
           </a>
-          <div className={styles.navLinks} style={{ justifySelf: "center" }}>
-            {[
-              { href: "#o-podjetju", label: "O podjetju" },
-              { href: "#storitve", label: "Storitve" },
-              { href: "#kontakt", label: "Kontakt" },
-            ].map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className={styles.navLink}
-                style={
-                  {
-                    "--link-color": linkColor,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    letterSpacing: ".06em",
-                    textTransform: "uppercase",
-                  } as React.CSSProperties
-                }
-              >
-                {l.label}
-              </a>
-            ))}
+          <div className={styles.navLinks} style={{ justifySelf: "center", transform: "translateX(clamp(0px,2vw,32px))" }}>
+            {navItems.map((l) => {
+              const isActive = activeSection === l.href.slice(1);
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className={styles.navLink}
+                  style={
+                    {
+                      "--link-color": isActive ? "var(--accent)" : linkColor,
+                      fontSize: 14,
+                      fontWeight: isActive ? 600 : 500,
+                      letterSpacing: ".06em",
+                      textTransform: "uppercase",
+                      textShadow: headerTextShadow,
+                      paddingBottom: 6,
+                    } as React.CSSProperties
+                  }
+                >
+                  {l.label}
+                  {isActive && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 2,
+                        borderRadius: 2,
+                        background: "var(--accent)",
+                      }}
+                    />
+                  )}
+                </a>
+              );
+            })}
           </div>
           <nav style={{ display: "flex", alignItems: "center", gap: 16, justifySelf: "end" }}>
             <a
-              href="tel:070799810"
-              className={styles.phoneBtn}
-              style={{
-                background: "var(--accent)",
-                color: "#fff",
-                padding: "11px 20px",
-                borderRadius: 2,
-                fontSize: 13,
-                fontWeight: 600,
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-              }}
+              href="#kontakt"
+              className={styles.headerCta}
+              style={
+                {
+                  "--cta-border": solid ? "rgba(38,35,31,.4)" : "rgba(255,255,255,.75)",
+                  "--cta-color": linkColor,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  borderRadius: 2,
+                  padding: "10px 18px",
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  letterSpacing: ".14em",
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  textShadow: headerTextShadow,
+                } as React.CSSProperties
+              }
             >
-              070 799 810
+              Povpraševanje
+              <span aria-hidden className={styles.ctaArrow} style={{ display: "inline-flex", alignItems: "center" }}>
+                <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
+                  <path
+                    d="M1 6H15M15 6L10 1M15 6L10 11"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
             </a>
             <button
               onClick={() => setMenuOpen((v) => !v)}
@@ -211,26 +289,25 @@ export default function Home() {
               gap: 4,
             }}
           >
-            {[
-              { href: "#o-podjetju", label: "O podjetju" },
-              { href: "#storitve", label: "Storitve" },
-              { href: "#kontakt", label: "Kontakt" },
-            ].map((l, i, arr) => (
-              <a
-                key={l.href}
-                href={l.href}
-                onClick={() => setMenuOpen(false)}
-                style={{
-                  padding: "14px 2px",
-                  borderBottom: i < arr.length - 1 ? "1px solid #f0ebe6" : undefined,
-                  fontSize: 17,
-                  fontWeight: 500,
-                  color: "#26231f",
-                }}
-              >
-                {l.label}
-              </a>
-            ))}
+            {navItems.map((l, i, arr) => {
+              const isActive = activeSection === l.href.slice(1);
+              return (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    padding: "14px 2px",
+                    borderBottom: i < arr.length - 1 ? "1px solid #f0ebe6" : undefined,
+                    fontSize: 17,
+                    fontWeight: isActive ? 600 : 500,
+                    color: isActive ? "var(--accent)" : "#26231f",
+                  }}
+                >
+                  {l.label}
+                </a>
+              );
+            })}
           </div>
         )}
       </header>
@@ -245,21 +322,19 @@ export default function Home() {
           minHeight: "100svh",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "flex-end",
         }}
       >
-        <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+        <div ref={heroBgWrapRef} style={{ position: "absolute", top: "8%", left: 0, right: 0, bottom: "-10%" }}>
           <img
-            ref={heroImgRef}
-            src="/uploads/hero.jpeg"
-            alt="Sodobna vila v sončnem zahodu"
+            src="/uploads/hero2.jpeg"
+            alt="Sodobna vila v večernem svetlobi"
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: "64% 50%",
-              transform: "scale(1.06)",
-              animation: "pgBurns 26s ease-in-out infinite alternate",
+              objectPosition: "50% 0%",
+              transform: "scale(1)",
+              animation: "pgBurns 30s ease-in-out infinite alternate",
               willChange: "transform",
             }}
           />
@@ -268,230 +343,158 @@ export default function Home() {
           style={{
             position: "absolute",
             inset: 0,
-            background:
-              "linear-gradient(to top, rgba(14,11,8,.92) 0%, rgba(14,11,8,.62) 26%, rgba(14,11,8,.16) 56%, rgba(14,11,8,.34) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(105deg, rgba(14,11,8,.78) 0%, rgba(14,11,8,.42) 40%, rgba(14,11,8,0) 72%)",
+            background: "linear-gradient(to top, rgba(10,8,6,.6) 0%, rgba(10,8,6,.22) 26%, rgba(10,8,6,0) 48%)",
             pointerEvents: "none",
           }}
         />
 
         <div
           style={{
-            ...containerStyle,
             position: "relative",
-            width: "100%",
-            paddingTop: "clamp(130px,18vh,190px)",
-            paddingBottom: "clamp(34px,5vh,54px)",
+            zIndex: 1,
+            flex: "1 1 auto",
+            display: "flex",
+            flexDirection: "column",
+            paddingTop: "clamp(96px,11vh,132px)",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 14,
-              animation: "pgUp .9s .15s cubic-bezier(.2,.7,.2,1) both",
-            }}
-          >
-            <span
+          <div style={{ flexGrow: 0.2 }} aria-hidden />
+
+          <div ref={heroContentRef} style={{ ...containerStyle, width: "100%" }}>
+            <h1
+              className="font-display"
               style={{
-                display: "block",
-                width: 44,
-                height: 2,
-                background: "var(--accent)",
-                transformOrigin: "left",
-                animation: "pgLine .9s .35s cubic-bezier(.2,.7,.2,1) both",
-              }}
-            />
-            <span
-              className="font-barlow-condensed"
-              style={{
-                fontSize: "clamp(12px,1.1vw,14px)",
-                fontWeight: 600,
-                letterSpacing: ".26em",
+                fontWeight: 400,
+                fontSize: "clamp(70px,19.6vw,406px)",
+                lineHeight: 1.14,
+                letterSpacing: "0em",
                 textTransform: "uppercase",
-                color: "rgba(255,255,255,.88)",
+                margin: 0,
+                color: "#fff",
+                textShadow: "0 2px 34px rgba(0,0,0,.42)",
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                animation: "pgUp 1.1s .2s cubic-bezier(.16,1,.3,1) both",
               }}
             >
-              Gornji Slaveči · Prekmurje
-            </span>
+              PG Inženiring
+            </h1>
           </div>
 
-          <h1
-            className="font-archivo"
-            style={{
-              fontWeight: 700,
-              fontSize: "clamp(42px,7.4vw,96px)",
-              lineHeight: 0.98,
-              letterSpacing: "-.03em",
-              margin: "clamp(18px,2.4vh,28px) 0 0",
-              color: "#fff",
-              textShadow: "0 2px 34px rgba(0,0,0,.42)",
-              textWrap: "balance",
-            }}
-          >
-            <span style={{ display: "block", overflow: "hidden" }}>
-              <span style={{ display: "block", animation: "pgUp 1.1s .2s cubic-bezier(.16,1,.3,1) both" }}>
-                Projektiranje,
-              </span>
-            </span>
-            <span style={{ display: "block", overflow: "hidden" }}>
-              <span style={{ display: "block", animation: "pgUp 1.1s .34s cubic-bezier(.16,1,.3,1) both" }}>
-                gradnja in
-              </span>
-            </span>
-            <span style={{ display: "block", overflow: "hidden" }}>
-              <span
-                style={{
-                  display: "block",
-                  color: "var(--accent-light)",
-                  animation: "pgUp 1.1s .48s cubic-bezier(.16,1,.3,1) both",
-                }}
-              >
-                nadzor.
-              </span>
-            </span>
-          </h1>
+          <div style={{ flexGrow: 0.45 }} aria-hidden />
 
-          <p
-            style={{
-              maxWidth: "52ch",
-              fontSize: "clamp(16px,1.45vw,20px)",
-              lineHeight: 1.65,
-              color: "rgba(255,255,255,.9)",
-              margin: "clamp(20px,2.6vh,30px) 0 0",
-              animation: "pgUp 1s .66s cubic-bezier(.16,1,.3,1) both",
-              textWrap: "pretty",
-            }}
-          >
-            Majhno inženirsko podjetje z osebnim pristopom. Od prve ideje in projektne dokumentacije do
-            izvedbe in strokovnega nadzora nad gradnjo — vse na enem mestu.
-          </p>
-
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 14,
-              marginTop: "clamp(26px,3.4vh,40px)",
-              animation: "pgUp 1s .8s cubic-bezier(.16,1,.3,1) both",
-            }}
-          >
-            <a
-              href="#kontakt"
-              className={styles.ctaPrimary}
-              style={{
-                background: "var(--accent)",
-                color: "#fff",
-                padding: "17px 32px",
-                borderRadius: 2,
-                fontSize: 14,
-                fontWeight: 600,
-                letterSpacing: ".1em",
-                textTransform: "uppercase",
-              }}
-            >
-              Povprašajte nas
-            </a>
-            <a
-              href="#storitve"
-              className={styles.ctaSecondary}
-              style={{
-                border: "1px solid rgba(255,255,255,.5)",
-                color: "#fff",
-                padding: "17px 32px",
-                borderRadius: 2,
-                fontSize: 14,
-                fontWeight: 600,
-                letterSpacing: ".1em",
-                textTransform: "uppercase",
-                backdropFilter: "blur(6px)",
-              }}
-            >
-              Naše storitve
-            </a>
-          </div>
-        </div>
-
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            borderTop: "1px solid rgba(255,255,255,.18)",
-            animation: "pgIn 1.2s 1s ease both",
-          }}
-        >
           <div
             style={{
               ...containerStyle,
+              width: "100%",
+              paddingBottom: "clamp(28px,5vh,64px)",
               display: "flex",
               flexWrap: "wrap",
-              alignItems: "stretch",
+              alignItems: "flex-end",
               justifyContent: "space-between",
-              gap: 0,
+              gap: 32,
             }}
           >
-            <div style={{ display: "flex", flexWrap: "wrap", flex: "1 1 auto" }}>
-              {heroMarks.map((m) => (
-                <div
-                  key={m.title}
+            <div style={{ display: "flex", flexDirection: "column", gap: "clamp(24px,4vh,44px)" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 16,
+                  animation: "pgUp 1s .5s cubic-bezier(.16,1,.3,1) both",
+                }}
+              >
+                <span style={{ width: 2, alignSelf: "stretch", flexShrink: 0, background: "var(--accent)", opacity: 0.5 }} />
+                <p
                   style={{
-                    padding: "20px 30px 22px 0",
-                    marginRight: 30,
-                    borderRight: "1px solid rgba(255,255,255,.14)",
+                    maxWidth: "38ch",
+                    fontSize: "clamp(15px,1.1vw,17px)",
+                    lineHeight: 1.65,
+                    color: "rgba(255,255,255,.92)",
+                    margin: 0,
+                    textShadow: "0 1px 16px rgba(0,0,0,.7), 0 1px 3px rgba(0,0,0,.6)",
+                    textWrap: "pretty",
                   }}
                 >
-                  <div
-                    className="font-archivo"
-                    style={{
-                      fontWeight: 700,
-                      fontSize: "clamp(15px,1.3vw,18px)",
-                      letterSpacing: "-.01em",
-                      color: "#fff",
-                    }}
-                  >
-                    {m.title}
+                  Od ideje do izvedbe.
+                  <br />
+                  Z znanjem. Z odgovornostjo.
+                  <br />
+                  Za ljudi in prostor.
+                </p>
+              </div>
+
+              <a
+                href="#o-podjetju"
+                aria-label="Pomaknite se navzdol"
+                className={styles.scrollCue}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 14,
+                  animation: "pgUp 1s .8s cubic-bezier(.16,1,.3,1) both",
+                }}
+              >
+                <span className={styles.scrollCueTrack} aria-hidden>
+                  <span className={styles.scrollCueDot} />
+                </span>
+                <span
+                  className="font-barlow-condensed"
+                  style={{ fontSize: 11, letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }}
+                >
+                  Razišči
+                </span>
+              </a>
+            </div>
+
+            <div
+              className={styles.heroMarkCardWrap}
+              style={{
+                width: "clamp(220px,17vw,260px)",
+                marginRight: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+              }}
+            >
+              {heroMarks.map((m, i) => (
+                <a
+                  key={m.title}
+                  href="#storitve"
+                  className={styles.heroIndexBox}
+                  style={{
+                    display: "block",
+                    padding: "16px 18px",
+                    animation: `pgUp .8s ${(0.85 + i * 0.1).toFixed(2)}s cubic-bezier(.16,1,.3,1) backwards`,
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                    <span
+                      className="font-archivo"
+                      style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".08em", color: "rgba(255,255,255,.45)" }}
+                    >
+                      0{i + 1}
+                    </span>
+                    <span
+                      className="font-archivo"
+                      style={{ fontWeight: 700, fontSize: 15, letterSpacing: ".03em", textTransform: "uppercase", color: "#fff" }}
+                    >
+                      {m.title}
+                    </span>
                   </div>
-                  <div style={{ fontSize: 13, color: "rgba(255,255,255,.62)", marginTop: 4, lineHeight: 1.45 }}>
-                    {m.text}
-                  </div>
-                </div>
+                  <div style={{ fontSize: 12.5, color: "rgba(255,255,255,.55)", lineHeight: 1.4, marginTop: 6 }}>{m.text}</div>
+                </a>
               ))}
             </div>
-            <a
-              href="#o-podjetju"
-              className={styles.scrollHint}
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "20px 0" }}
-            >
-              <span
-                className="font-barlow-condensed"
-                style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase" }}
-              >
-                Pomaknite navzdol
-              </span>
-              <span style={{ display: "block", animation: "pgBob 2.4s ease-in-out infinite" }}>
-                <svg width="14" height="22" viewBox="0 0 14 22" fill="none" aria-hidden="true">
-                  <path d="M7 0v19M1 13l6 7 6-7" stroke="currentColor" strokeWidth="1.4" />
-                </svg>
-              </span>
-            </a>
           </div>
         </div>
       </section>
 
-      <section id="o-podjetju" className={styles.aboutSection}>
+      <section id="o-podjetju" ref={aboutSectionRef} className={styles.aboutSection}>
         <div
           style={{
             ...containerStyle,
-            paddingTop: "clamp(40px,6vw,88px)",
-            paddingBottom: "clamp(32px,5vw,64px)",
+            paddingTop: "clamp(64px,9vw,120px)",
+            paddingBottom: "clamp(64px,9vw,120px)",
           }}
           className={styles.aboutGrid}
         >
@@ -529,11 +532,11 @@ export default function Home() {
             <Reveal delay={170}>
               <p
                 style={{
-                  fontSize: "clamp(16px,1.3vw,19px)",
-                  lineHeight: 1.6,
+                  fontSize: "clamp(17px,1.5vw,21px)",
+                  lineHeight: 1.75,
                   color: "#5a544c",
-                  margin: "22px 0 0",
-                  maxWidth: "56ch",
+                  margin: "28px 0 0",
+                  maxWidth: "54ch",
                   textWrap: "pretty",
                 }}
               >
@@ -544,8 +547,8 @@ export default function Home() {
               </p>
             </Reveal>
 
-            <div className={styles.principlesGrid} style={{ marginTop: "clamp(28px,4vw,44px)" }}>
-              {principles.map((p) => (
+            <div className={styles.principlesGrid} style={{ marginTop: "clamp(40px,5vw,64px)" }}>
+              {principles.map((p, i) => (
                 <Reveal key={p.title} delay={220 + p.delay}>
                   <div className={styles.principleCard}>
                     <div
@@ -560,7 +563,13 @@ export default function Home() {
                     >
                       {p.title}
                     </div>
-                    <div style={{ fontSize: 14, lineHeight: 1.55, color: "#7d766d", marginTop: 6, textWrap: "pretty" }}>
+                    <div
+                      ref={(el) => {
+                        principleDividerRefs.current[i] = el;
+                      }}
+                      style={{ width: 28, height: 2, background: "var(--accent)", marginTop: 10 }}
+                    />
+                    <div style={{ fontSize: 14, lineHeight: 1.55, color: "#7d766d", marginTop: 8, textWrap: "pretty" }}>
                       {p.text}
                     </div>
                   </div>
@@ -573,15 +582,15 @@ export default function Home() {
             <div className={styles.aboutImageFrame}>
               <img
                 ref={aboutImgRef}
-                src="/uploads/hero.png"
-                alt="Arhitekturna zasnova sodobne vile"
+                src="/uploads/photo2.png"
+                alt="Delovni prostor s projektno dokumentacijo"
                 style={{
                   position: "absolute",
                   inset: "-6% 0",
                   width: "100%",
                   height: "112%",
                   objectFit: "cover",
-                  objectPosition: "30% 25%",
+                  objectPosition: "50% 45%",
                 }}
               />
               <div
@@ -589,6 +598,16 @@ export default function Home() {
                   position: "absolute",
                   inset: 0,
                   background: "linear-gradient(180deg, rgba(20,17,14,0) 55%, rgba(20,17,14,.6) 100%)",
+                }}
+              />
+              <div
+                ref={aboutVignetteRef}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  opacity: 0,
+                  background: "radial-gradient(120% 120% at 50% 50%, rgba(0,0,0,0) 45%, rgba(10,8,6,.75) 100%)",
+                  pointerEvents: "none",
                 }}
               />
               <div style={{ position: "absolute", left: 18, right: 18, bottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
@@ -605,10 +624,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section style={{ position: "relative", overflow: "hidden", background: "#14110e" }}>
+      <section ref={quoteSectionRef} style={{ position: "relative", overflow: "hidden", background: "#14110e" }}>
         <img
           ref={quoteImgRef}
-          src="/uploads/hero.png"
+          src="/uploads/photo3.png"
           alt=""
           style={{
             position: "absolute",
@@ -616,7 +635,7 @@ export default function Home() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            objectPosition: "50% 40%",
+            objectPosition: "55% 30%",
             opacity: 0.4,
             transform: "scale(1.08)",
             willChange: "transform",
@@ -631,6 +650,7 @@ export default function Home() {
           }}
         />
         <div style={{ ...containerStyle, position: "relative", paddingTop: "clamp(80px,11vw,150px)", paddingBottom: "clamp(80px,11vw,150px)" }}>
+          <div ref={quoteHeadingRef}>
           <Reveal style={{ maxWidth: 900 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <span style={{ display: "block", width: 40, height: 2, background: "var(--accent)" }} />
@@ -669,6 +689,7 @@ export default function Home() {
               Ekipa PG Inženiring
             </div>
           </Reveal>
+          </div>
         </div>
       </section>
 
@@ -717,48 +738,54 @@ export default function Home() {
           </Reveal>
 
           <div style={{ marginTop: "clamp(44px,6vw,80px)", borderTop: "1px solid #e9e2d9" }}>
-            {services.map((s) => (
-              <Reveal key={s.num} delay={s.delay}>
+            {services.map((s, i) => (
+              <div
+                key={s.num}
+                ref={(el) => {
+                  serviceRowRefs.current[i] = el;
+                }}
+                className={styles.serviceCard}
+                style={{
+                  position: "relative",
+                  borderBottom: "1px solid #e9e2d9",
+                  padding: "clamp(28px,3.4vw,44px) clamp(4px,1.4vw,22px)",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))",
+                  gap: "clamp(18px,3vw,48px)",
+                  alignItems: "start",
+                  opacity: 1,
+                }}
+              >
                 <div
-                  className={styles.serviceCard}
-                  style={{
-                    position: "relative",
-                    borderBottom: "1px solid #e9e2d9",
-                    padding: "clamp(28px,3.4vw,44px) clamp(4px,1.4vw,22px)",
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))",
-                    gap: "clamp(18px,3vw,48px)",
-                    alignItems: "start",
+                  ref={(el) => {
+                    serviceLineRefs.current[i] = el;
                   }}
-                >
+                  className={styles.cardBar}
+                  style={{ position: "absolute", left: 0, right: 0, bottom: -1, height: 2, background: "var(--accent)" }}
+                />
+                <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(14px,2vw,26px)" }}>
                   <div
-                    className={styles.cardBar}
-                    style={{ position: "absolute", left: 0, right: 0, bottom: -1, height: 2, background: "var(--accent)" }}
-                  />
-                  <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(14px,2vw,26px)" }}>
-                    <div
-                      className="font-archivo"
-                      style={{ fontWeight: 700, fontSize: "clamp(28px,3.4vw,46px)", lineHeight: 0.9, letterSpacing: "-.03em", color: "#dcd4c9" }}
-                    >
-                      {s.num}
-                    </div>
-                    <h3 className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(26px,3vw,40px)", lineHeight: 1.02, letterSpacing: "-.028em", margin: 0 }}>
-                      {s.title}
-                    </h3>
+                    className="font-archivo"
+                    style={{ fontWeight: 700, fontSize: "clamp(28px,3.4vw,46px)", lineHeight: 0.9, letterSpacing: "-.03em", color: "#dcd4c9" }}
+                  >
+                    {s.num}
                   </div>
-                  <p style={{ fontSize: "clamp(15px,1.2vw,17px)", lineHeight: 1.75, color: "#5a544c", margin: 0, maxWidth: "42ch", textWrap: "pretty" }}>
-                    {s.text}
-                  </p>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-                    {s.items.map((it) => (
-                      <li key={it} style={{ display: "flex", gap: 12, alignItems: "flex-start", fontSize: 15, color: "#4a453f", lineHeight: 1.5 }}>
-                        <span style={{ flexShrink: 0, width: 5, height: 5, background: "var(--accent)", marginTop: 8, borderRadius: "50%" }} />
-                        <span>{it}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <h3 className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(26px,3vw,40px)", lineHeight: 1.02, letterSpacing: "-.028em", margin: 0 }}>
+                    {s.title}
+                  </h3>
                 </div>
-              </Reveal>
+                <p style={{ fontSize: "clamp(15px,1.2vw,17px)", lineHeight: 1.75, color: "#5a544c", margin: 0, maxWidth: "42ch", textWrap: "pretty" }}>
+                  {s.text}
+                </p>
+                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
+                  {s.items.map((it) => (
+                    <li key={it} style={{ display: "flex", gap: 12, alignItems: "flex-start", fontSize: 15, color: "#4a453f", lineHeight: 1.5 }}>
+                      <span style={{ flexShrink: 0, width: 5, height: 5, background: "var(--accent)", marginTop: 8, borderRadius: "50%" }} />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
@@ -795,13 +822,16 @@ export default function Home() {
           <div ref={stepsContainerRef} style={{ position: "relative", marginTop: "clamp(44px,6vw,72px)" }}>
             <div style={{ position: "absolute", left: 0, right: 0, top: 5, height: 1, background: "#efe9e2" }} />
             <div
+              ref={stepsBarRef}
               style={{
                 position: "absolute",
                 left: 0,
                 top: 5,
                 height: 1,
+                width: "100%",
                 background: "var(--accent)",
-                width: `${stepsProgress * 100}%`,
+                transform: "scaleX(1)",
+                transformOrigin: "left center",
               }}
             />
             <div
@@ -812,51 +842,51 @@ export default function Home() {
                 gap: "clamp(28px,3.4vw,44px)",
               }}
             >
-              {steps.map((st, i) => {
-                const active = stepsProgress >= i / (steps.length - 1) - 0.02;
-                return (
-                  <Reveal key={st.num} delay={st.delay} style={{ paddingRight: "clamp(0px,1.5vw,24px)" }}>
+              {steps.map((st, i) => (
+                <Reveal key={st.num} delay={st.delay} style={{ paddingRight: "clamp(0px,1.5vw,24px)" }}>
+                  <span
+                    ref={(el) => {
+                      stepDotRefs.current[i] = el;
+                    }}
+                    style={{
+                      display: "block",
+                      width: 11,
+                      height: 11,
+                      background: "var(--accent)",
+                      borderRadius: "50%",
+                      boxShadow: "0 0 0 5px #fff, 0 0 0 3px rgba(232,116,36,.18)",
+                      marginBottom: "clamp(22px,2.6vw,32px)",
+                    }}
+                  />
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                     <span
-                      style={{
-                        display: "block",
-                        width: 11,
-                        height: 11,
-                        background: active ? "var(--accent)" : "#e6ded3",
-                        borderRadius: "50%",
-                        boxShadow: `0 0 0 5px #fff, 0 0 0 ${active ? 3 : 0}px rgba(232,116,36,.18)`,
-                        marginBottom: "clamp(22px,2.6vw,32px)",
-                        transform: active ? "scale(1.15)" : "scale(1)",
-                        transition: "background .5s ease, box-shadow .5s ease, transform .5s cubic-bezier(.2,.7,.2,1)",
+                      ref={(el) => {
+                        stepNumRefs.current[i] = el;
                       }}
-                    />
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-                      <span
-                        className="font-archivo"
-                        style={{
-                          fontWeight: 700,
-                          fontSize: "clamp(30px,3vw,40px)",
-                          lineHeight: 0.9,
-                          letterSpacing: "-.03em",
-                          color: active ? "#dcd4c9" : "#e6ded3",
-                          transition: "color .5s ease",
-                        }}
-                      >
-                        {st.num}
-                      </span>
-                      <span className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(19px,1.7vw,23px)", letterSpacing: "-.015em" }}>
-                        {st.title}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5a544c", margin: "14px 0 0", textWrap: "pretty" }}>{st.text}</p>
-                  </Reveal>
-                );
-              })}
+                      className="font-archivo"
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "clamp(30px,3vw,40px)",
+                        lineHeight: 0.9,
+                        letterSpacing: "-.03em",
+                        color: "#dcd4c9",
+                      }}
+                    >
+                      {st.num}
+                    </span>
+                    <span className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(19px,1.7vw,23px)", letterSpacing: "-.015em" }}>
+                      {st.title}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5a544c", margin: "14px 0 0", textWrap: "pretty" }}>{st.text}</p>
+                </Reveal>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="kontakt" style={{ background: "#fbfaf9", borderTop: "1px solid #f0ebe5" }}>
+      <section id="kontakt" ref={contactSectionRef} style={{ background: "#fbfaf9", borderTop: "1px solid #f0ebe5", position: "relative" }}>
         <div
           style={{
             ...containerStyle,
@@ -956,10 +986,25 @@ export default function Home() {
             </div>
           </Reveal>
 
-          <Reveal delay={140}>
+          <div ref={contactCardRef} style={{ position: "relative", opacity: 1 }}>
+            <div
+              ref={contactGlowRef}
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: "-10%",
+                opacity: 0,
+                background: "radial-gradient(60% 60% at 50% 60%, rgba(232,116,36,.45) 0%, rgba(232,116,36,0) 70%)",
+                filter: "blur(30px)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
             <form
               onSubmit={handleSubmit}
               style={{
+                position: "relative",
+                zIndex: 1,
                 background: "#fff",
                 border: "1px solid #eee7e0",
                 borderRadius: 3,
@@ -1068,7 +1113,7 @@ export default function Home() {
                 </div>
               )}
             </form>
-          </Reveal>
+          </div>
         </div>
       </section>
 
