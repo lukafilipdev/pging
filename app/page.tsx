@@ -358,9 +358,26 @@ export default function Home() {
             paddingTop: "clamp(96px,11vh,132px)",
           }}
         >
-          <div style={{ flexGrow: 0.2 }} aria-hidden />
+          <div className={styles.heroTopSpacer} aria-hidden />
 
           <div ref={heroContentRef} style={{ ...containerStyle, width: "100%" }}>
+            <div
+              className={`font-barlow-condensed ${styles.mobileEyebrow}`}
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: ".26em",
+                textTransform: "uppercase",
+                textAlign: "center",
+                color: "rgba(255,255,255,.8)",
+                margin: "0 0 clamp(16px,4vh,28px)",
+                textShadow: "0 1px 8px rgba(0,0,0,.6)",
+                animation: "pgUp 1s .2s cubic-bezier(.16,1,.3,1) both",
+              }}
+            >
+              Od ideje do izvedbe.
+            </div>
+
             <h1
               className="font-display"
               style={{
@@ -379,16 +396,51 @@ export default function Home() {
             >
               PG Inženiring
             </h1>
+
+            <div
+              className={styles.mobileSubcopy}
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 16,
+                marginTop: "clamp(20px,4vh,32px)",
+                animation: "pgUp 1s .4s cubic-bezier(.16,1,.3,1) both",
+              }}
+            >
+              <span style={{ width: 44, height: 2, background: "var(--accent)" }} />
+              <p
+                className="font-barlow-condensed"
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  letterSpacing: ".18em",
+                  textTransform: "uppercase",
+                  textAlign: "center",
+                  lineHeight: 1.9,
+                  color: "rgba(255,255,255,.8)",
+                  margin: 0,
+                  textShadow: "0 1px 8px rgba(0,0,0,.6)",
+                }}
+              >
+                Z znanjem. Z odgovornostjo.
+                <br />
+                Za ljudi in prostor.
+              </p>
+            </div>
           </div>
 
-          <div style={{ flexGrow: 0.45 }} aria-hidden />
+          <div className={styles.heroMidSpacer} aria-hidden />
 
           <div
             style={{
               ...containerStyle,
               width: "100%",
               paddingBottom: "clamp(28px,5vh,64px)",
-              display: "flex",
+            }}
+          >
+          <div
+            className={styles.desktopBottomContent}
+            style={{
               flexWrap: "wrap",
               alignItems: "flex-end",
               justifyContent: "space-between",
@@ -486,6 +538,71 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          <div className={styles.mobileBottomContent}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              {heroMarks.map((m, i) => (
+                <a
+                  key={m.title}
+                  href="#storitve"
+                  style={{
+                    flex: 1,
+                    textAlign: "center",
+                    padding: "0 6px",
+                    borderLeft: i > 0 ? "1px solid rgba(255,255,255,.15)" : "none",
+                    animation: `pgUp .8s ${(0.85 + i * 0.1).toFixed(2)}s cubic-bezier(.16,1,.3,1) backwards`,
+                  }}
+                >
+                  <div className="font-archivo" style={{ fontWeight: 700, fontSize: 22, color: "rgba(255,255,255,.5)" }}>
+                    0{i + 1}
+                  </div>
+                  <div
+                    className="font-archivo"
+                    style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", marginTop: 6 }}
+                  >
+                    {m.title}
+                  </div>
+                  <span
+                    style={{
+                      display: "block",
+                      width: 32,
+                      height: 2,
+                      margin: "12px auto 0",
+                      background: i === 0 ? "var(--accent)" : "rgba(255,255,255,.28)",
+                    }}
+                  />
+                </a>
+              ))}
+            </div>
+
+            <a
+              href="#o-podjetju"
+              aria-label="Pomaknite se navzdol"
+              className={styles.scrollCue}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 12,
+                marginTop: "clamp(28px,6vh,44px)",
+                animation: "pgUp 1s .8s cubic-bezier(.16,1,.3,1) both",
+              }}
+            >
+              <span className={styles.scrollCueTrack} aria-hidden>
+                <span className={styles.scrollCueDot} />
+              </span>
+              <span
+                className="font-barlow-condensed"
+                style={{ fontSize: 11, letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }}
+              >
+                Razišči
+              </span>
+              <svg width="14" height="9" viewBox="0 0 14 9" fill="none" aria-hidden="true">
+                <path d="M1 1L7 7L13 1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          </div>
+        </div>
         </div>
       </section>
 

@@ -29,6 +29,48 @@
   }
 }
 
+.heroTopSpacer {
+  flex-grow: 0.2;
+}
+
+.heroMidSpacer {
+  flex-grow: 0.45;
+}
+
+.mobileEyebrow,
+.mobileSubcopy {
+  display: none;
+}
+
+.desktopBottomContent {
+  display: flex;
+}
+
+.mobileBottomContent {
+  display: none;
+}
+
+@media (max-width: 680px) {
+  .mobileEyebrow {
+    display: block;
+  }
+  .mobileSubcopy {
+    display: flex;
+  }
+  .desktopBottomContent {
+    display: none;
+  }
+  .mobileBottomContent {
+    display: block;
+  }
+  .heroTopSpacer {
+    flex-grow: 0.15;
+  }
+  .heroMidSpacer {
+    flex-grow: 1.1;
+  }
+}
+
 .navLink {
   position: relative;
   color: var(--link-color);
