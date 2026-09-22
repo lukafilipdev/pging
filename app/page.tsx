@@ -55,6 +55,13 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   const solid = useHeaderSolid(heroRef);
   const activeSection = useActiveSection(["top", "o-podjetju", "storitve", "kontakt"]);
   useQuoteParallax(quoteImgRef);
@@ -82,9 +89,10 @@ export default function Home() {
   };
   useScrollFx(fxRefs);
 
-  const linkColor = solid ? "#4a453f" : "#fff";
-  const inkLabelColor = solid ? "rgba(38,35,31,.62)" : "rgba(255,255,255,.95)";
-  const headerTextShadow = solid ? "none" : "0 1px 8px rgba(0,0,0,.4)";
+  const headerSolid = solid && !menuOpen;
+  const linkColor = headerSolid ? "#4a453f" : "#fff";
+  const inkLabelColor = headerSolid ? "rgba(38,35,31,.62)" : "rgba(255,255,255,.95)";
+  const headerTextShadow = headerSolid ? "none" : "0 1px 8px rgba(0,0,0,.4)";
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -135,9 +143,9 @@ export default function Home() {
           top: 0,
           left: 0,
           right: 0,
-          zIndex: 50,
-          background: solid ? "rgba(251,250,249,.92)" : "transparent",
-          backdropFilter: solid ? "blur(14px)" : "none",
+          zIndex: 70,
+          background: headerSolid ? "rgba(251,250,249,.92)" : "transparent",
+          backdropFilter: headerSolid ? "blur(14px)" : "none",
           transition: "background .5s ease, backdrop-filter .5s ease",
         }}
       >
@@ -152,15 +160,15 @@ export default function Home() {
             gap: 20,
           }}
         >
-          <a href="#top" style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+          <a href="#top" style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }} onClick={() => setMenuOpen(false)}>
             <img
-              src={solid ? "/uploads/logo.png" : "/uploads/logo-white.png"}
+              src={headerSolid ? "/uploads/logo.png" : "/uploads/logo-white.png"}
               alt="PG Inženiring"
               className={styles.logoImg}
               style={{
                 width: 74,
                 height: "auto",
-                filter: solid ? "none" : "drop-shadow(0 2px 10px rgba(0,0,0,.45))",
+                filter: headerSolid ? "none" : "drop-shadow(0 2px 10px rgba(0,0,0,.45))",
                 transition: "filter .5s ease, width .3s ease",
               }}
             />
@@ -226,9 +234,8 @@ export default function Home() {
               className={styles.headerCta}
               style={
                 {
-                  "--cta-border": solid ? "rgba(38,35,31,.4)" : "rgba(255,255,255,.75)",
+                  "--cta-border": headerSolid ? "rgba(38,35,31,.4)" : "rgba(255,255,255,.75)",
                   "--cta-color": linkColor,
-                  display: "inline-flex",
                   alignItems: "center",
                   gap: 10,
                   borderRadius: 2,
@@ -257,11 +264,12 @@ export default function Home() {
             </a>
             <button
               onClick={() => setMenuOpen((v) => !v)}
-              aria-label="Meni"
+              aria-label={menuOpen ? "Zapri meni" : "Meni"}
+              aria-expanded={menuOpen}
               className={styles.burger}
               style={{
-                background: solid ? "transparent" : "rgba(0,0,0,.18)",
-                border: `1px solid ${solid ? "#e0dad3" : "rgba(255,255,255,.45)"}`,
+                background: headerSolid ? "transparent" : "rgba(0,0,0,.18)",
+                border: `1px solid ${headerSolid ? "#e0dad3" : "rgba(255,255,255,.45)"}`,
                 borderRadius: 2,
                 width: 44,
                 height: 44,
@@ -270,47 +278,82 @@ export default function Home() {
                 cursor: "pointer",
                 flexDirection: "column",
                 gap: 5,
+                position: "relative",
+                zIndex: 71,
               }}
             >
-              <span style={{ display: "block", width: 18, height: 2, background: solid ? "#4a453f" : "#fff" }} />
-              <span style={{ display: "block", width: 18, height: 2, background: solid ? "#4a453f" : "#fff" }} />
+              <span
+                style={{
+                  display: "block",
+                  width: 18,
+                  height: 2,
+                  background: headerSolid ? "#4a453f" : "#fff",
+                  transition: "transform .35s cubic-bezier(.16,1,.3,1), background .3s ease",
+                  transform: menuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
+                }}
+              />
+              <span
+                style={{
+                  display: "block",
+                  width: 18,
+                  height: 2,
+                  background: headerSolid ? "#4a453f" : "#fff",
+                  transition: "transform .35s cubic-bezier(.16,1,.3,1), background .3s ease",
+                  transform: menuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
+                }}
+              />
             </button>
           </nav>
         </div>
-        {menuOpen && (
-          <div
-            className={styles.mobileMenu}
-            style={{
-              background: "#fbfaf9",
-              borderTop: "1px solid #eae5e0",
-              padding: "10px 22px 22px",
-              display: "flex",
-              flexDirection: "column",
-              gap: 4,
-            }}
-          >
-            {navItems.map((l, i, arr) => {
-              const isActive = activeSection === l.href.slice(1);
-              return (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setMenuOpen(false)}
-                  style={{
-                    padding: "14px 2px",
-                    borderBottom: i < arr.length - 1 ? "1px solid #f0ebe6" : undefined,
-                    fontSize: 17,
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? "var(--accent)" : "#26231f",
-                  }}
-                >
-                  {l.label}
-                </a>
-              );
-            })}
-          </div>
-        )}
       </header>
+
+      <div
+        className={`${styles.mobileMenuOverlay} ${menuOpen ? styles.mobileMenuOpen : ""}`}
+        aria-hidden={!menuOpen}
+      >
+        <nav className={styles.mobileMenuNav}>
+          {navItems.map((l, i) => {
+            const isActive = activeSection === l.href.slice(1);
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                onClick={() => setMenuOpen(false)}
+                className={styles.mobileMenuLink}
+                style={{ transitionDelay: menuOpen ? `${0.08 * i + 0.15}s` : "0s", color: isActive ? "var(--accent-light)" : "#fff" }}
+              >
+                <span className={styles.mobileMenuLinkNum}>0{i + 1}</span>
+                {l.label}
+              </a>
+            );
+          })}
+        </nav>
+
+        <div className={styles.mobileMenuFooter} style={{ transitionDelay: menuOpen ? ".5s" : "0s" }}>
+          <a
+            href="#kontakt"
+            onClick={() => setMenuOpen(false)}
+            className={styles.mobileMenuCta}
+          >
+            Povpraševanje
+            <span aria-hidden style={{ display: "inline-flex", alignItems: "center" }}>
+              <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
+                <path
+                  d="M1 6H15M15 6L10 1M15 6L10 11"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </a>
+          <div className={styles.mobileMenuContact}>
+            <a href="tel:070799810">070 799 810</a>
+            <a href="mailto:info@pg-inzeniring.si">info@pg-inzeniring.si</a>
+          </div>
+        </div>
+      </div>
 
       <section
         id="top"
@@ -1290,7 +1333,7 @@ export default function Home() {
             className="font-archivo"
             style={{
               fontWeight: 700,
-              fontSize: "clamp(52px,13vw,190px)",
+              fontSize: "clamp(40px,11.6vw,190px)",
               lineHeight: 0.82,
               letterSpacing: "-.045em",
               color: "rgba(255,255,255,.055)",
