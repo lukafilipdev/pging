@@ -368,19 +368,22 @@ export default function Home() {
         }}
       >
         <div ref={heroBgWrapRef} style={{ position: "absolute", top: "8%", left: 0, right: 0, bottom: "-10%" }}>
-          <img
-            src="/uploads/hero2.jpeg"
-            alt="Sodobna vila v večernem svetlobi"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "50% 0%",
-              transform: "scale(1)",
-              animation: "pgBurns 30s ease-in-out infinite alternate",
-              willChange: "transform",
-            }}
-          />
+          <picture>
+            <source media="(max-width: 680px)" srcSet="/uploads/mobilehero.jpeg" />
+            <img
+              src="/uploads/hero2.jpeg"
+              alt="Sodobna vila v večernem svetlobi"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "50% 0%",
+                transform: "scale(1)",
+                animation: "pgBurns 30s ease-in-out infinite alternate",
+                willChange: "transform",
+              }}
+            />
+          </picture>
         </div>
         <div
           style={{
