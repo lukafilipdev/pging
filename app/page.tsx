@@ -450,7 +450,7 @@ export default function Home() {
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 16,
-                marginTop: "clamp(10px,2vh,18px)",
+                marginTop: "clamp(0px,1vh,8px)",
                 animation: "pgUp 1s .4s cubic-bezier(.16,1,.3,1) both",
               }}
             >

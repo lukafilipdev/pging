@@ -81,7 +81,7 @@
     display: block;
   }
   .heroContentGrid {
-    grid-template-rows: 0.15fr auto 1.1fr auto;
+    grid-template-rows: 0.1fr auto 1.3fr auto;
   }
   .heroComposition {
     max-height: 100vh;
