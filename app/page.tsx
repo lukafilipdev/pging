@@ -358,11 +358,11 @@ export default function Home() {
       <section
         id="top"
         ref={heroRef}
+        className={styles.heroSection}
         style={{
           position: "relative",
           overflow: "hidden",
           background: "#14110e",
-          minHeight: "100svh",
           display: "flex",
           flexDirection: "column",
         }}
