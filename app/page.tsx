@@ -396,23 +396,20 @@ export default function Home() {
         />
 
         <div
+          className={styles.heroContentGrid}
           style={{
             position: "relative",
             zIndex: 1,
-            flex: "1 1 auto",
-            display: "flex",
-            flexDirection: "column",
             paddingTop: "clamp(96px,11vh,132px)",
           }}
         >
-          <div className={styles.heroTopSpacer} aria-hidden />
-
-          <div ref={heroContentRef} style={{ ...containerStyle, width: "100%" }}>
+          <div ref={heroContentRef} style={{ ...containerStyle, width: "100%", gridRow: 2 }}>
             <div
               className={`font-barlow-condensed ${styles.mobileEyebrow}`}
               style={{
                 fontSize: 12,
                 fontWeight: 600,
+                lineHeight: 1.2,
                 letterSpacing: ".26em",
                 textTransform: "uppercase",
                 textAlign: "center",
@@ -476,12 +473,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={styles.heroMidSpacer} aria-hidden />
-
           <div
             style={{
               ...containerStyle,
               width: "100%",
+              gridRow: 4,
               paddingBottom: "clamp(28px,5vh,64px)",
             }}
           >

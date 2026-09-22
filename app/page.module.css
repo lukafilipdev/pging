@@ -35,12 +35,14 @@
   }
 }
 
-.heroTopSpacer {
-  flex-grow: 0.2;
-}
-
-.heroMidSpacer {
-  flex-grow: 0.45;
+.heroContentGrid {
+  display: grid;
+  grid-template-rows: 0.2fr auto 0.45fr auto;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
 }
 
 .mobileEyebrow,
@@ -69,11 +71,8 @@
   .mobileBottomContent {
     display: block;
   }
-  .heroTopSpacer {
-    flex-grow: 0.15;
-  }
-  .heroMidSpacer {
-    flex-grow: 1.1;
+  .heroContentGrid {
+    grid-template-rows: 0.15fr auto 1.1fr auto;
   }
 }
 
