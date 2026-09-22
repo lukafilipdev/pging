@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type CSSProperties } from "react";
 import styles from "./page.module.css";
 import { heroMarks, principles, services, steps } from "./lib/data";
-import { useActiveSection, useHeaderSolid, useQuoteParallax, useReveal } from "./lib/hooks";
+import { useActiveSection, useHeaderSolid, useQuoteParallax, useReveal, useViewportHeightVar } from "./lib/hooks";
 import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
 
 function Reveal({
@@ -63,6 +63,7 @@ export default function Home() {
   }, [menuOpen]);
 
   const solid = useHeaderSolid(heroRef);
+  useViewportHeightVar(heroRef);
   const activeSection = useActiveSection(["top", "o-podjetju", "storitve", "kontakt"]);
   useQuoteParallax(quoteImgRef);
 

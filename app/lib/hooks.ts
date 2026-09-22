@@ -55,6 +55,27 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(delay = 0) {
   return { ref, style };
 }
 
+export function useViewportHeightVar(ref: RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const vv = window.visualViewport;
+    const setHeight = () => {
+      const h = vv?.height ?? window.innerHeight;
+      el.style.minHeight = `${h}px`;
+    };
+    setHeight();
+    window.addEventListener("resize", setHeight);
+    window.addEventListener("orientationchange", setHeight);
+    vv?.addEventListener("resize", setHeight);
+    return () => {
+      window.removeEventListener("resize", setHeight);
+      window.removeEventListener("orientationchange", setHeight);
+      vv?.removeEventListener("resize", setHeight);
+    };
+  }, [ref]);
+}
+
 export function useHeaderSolid(heroRef: RefObject<HTMLElement | null>) {
   const [solid, setSolid] = useState(false);
 
