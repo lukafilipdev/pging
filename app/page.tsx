@@ -154,9 +154,9 @@ export default function Home() {
             ...containerStyle,
             paddingTop: 14,
             paddingBottom: 14,
-            display: "grid",
-            gridTemplateColumns: "auto 1fr auto",
+            display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             gap: 20,
           }}
         >
@@ -190,7 +190,7 @@ export default function Home() {
               d.o.o.
             </span>
           </a>
-          <div className={styles.navLinks} style={{ justifySelf: "center", transform: "translateX(clamp(0px,2vw,32px))" }}>
+          <div className={styles.navLinks} style={{ transform: "translateX(clamp(0px,2vw,32px))" }}>
             {navItems.map((l) => {
               const isActive = activeSection === l.href.slice(1);
               return (
@@ -228,7 +228,7 @@ export default function Home() {
               );
             })}
           </div>
-          <nav style={{ display: "flex", alignItems: "center", gap: 16, justifySelf: "end" }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
             <a
               href="#kontakt"
               className={styles.headerCta}
