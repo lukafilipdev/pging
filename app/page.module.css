@@ -35,6 +35,15 @@
   }
 }
 
+.heroComposition {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .heroContentGrid {
   display: grid;
   grid-template-rows: 0.2fr auto 0.45fr auto;
@@ -73,6 +82,10 @@
   }
   .heroContentGrid {
     grid-template-rows: 0.15fr auto 1.1fr auto;
+  }
+  .heroComposition {
+    max-height: 100vh;
+    max-height: 100svh;
   }
 }
 

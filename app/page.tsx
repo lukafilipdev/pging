@@ -368,6 +368,7 @@ export default function Home() {
           flexDirection: "column",
         }}
       >
+        <div className={styles.heroComposition}>
         <div ref={heroBgWrapRef} style={{ position: "absolute", top: "8%", left: 0, right: 0, bottom: "-10%" }}>
           <picture>
             <source media="(max-width: 680px)" srcSet="/uploads/mobilehero.jpeg" />
@@ -645,6 +646,7 @@ export default function Home() {
               </svg>
             </a>
           </div>
+        </div>
         </div>
         </div>
       </section>
