@@ -46,7 +46,7 @@
 
 .heroContentGrid {
   display: grid;
-  grid-template-rows: 0.2fr auto 0.45fr auto;
+  grid-template-rows: 0.04fr auto 0.61fr auto;
   align-items: center;
   justify-items: center;
   width: 100%;
@@ -86,6 +86,80 @@
   .heroComposition {
     max-height: 100vh;
     max-height: 100svh;
+  }
+}
+
+.stepsTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 5px;
+  height: 1px;
+  background: #efe9e2;
+}
+
+.stepsBar {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  height: 1px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.stepsGrid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: clamp(28px, 3.4vw, 44px);
+}
+
+.stepDot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px #fff, 0 0 0 3px rgba(232, 116, 36, 0.18);
+  margin-bottom: clamp(22px, 2.6vw, 32px);
+  flex-shrink: 0;
+}
+
+@media (max-width: 680px) {
+  .stepsTrack {
+    left: 5px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    height: auto;
+  }
+  .stepsBar {
+    left: 5px;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    transform: scaleY(1);
+    transform-origin: center top;
+  }
+  .stepsGrid {
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 9vw, 44px);
+  }
+  .stepItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .stepDot {
+    margin-bottom: 0;
+    margin-top: 6px;
+  }
+  .stepItemBody {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 

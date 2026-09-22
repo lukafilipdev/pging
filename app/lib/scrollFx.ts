@@ -47,9 +47,10 @@ export function useScrollFx(refs: ScrollFxRefs) {
         {
           motionOK: "(prefers-reduced-motion: no-preference)",
           isDesktop: "(min-width: 900px)",
+          isStepsVertical: "(max-width: 680px)",
         },
         (context) => {
-          const { motionOK, isDesktop } = (context.conditions ?? {}) as Record<string, boolean>;
+          const { motionOK, isDesktop, isStepsVertical } = (context.conditions ?? {}) as Record<string, boolean>;
           if (!motionOK) return;
 
           const cleanups: Array<() => void> = [];
@@ -182,7 +183,13 @@ export function useScrollFx(refs: ScrollFxRefs) {
             const dots = refs.stepDots.current || [];
             const nums = refs.stepNums.current || [];
             const count = dots.length;
-            gsap.set(bar, { scaleX: 0, transformOrigin: "left center" });
+            const barProp = isStepsVertical ? "scaleY" : "scaleX";
+            gsap.set(bar, {
+              scaleX: 1,
+              scaleY: 1,
+              [barProp]: 0,
+              transformOrigin: isStepsVertical ? "center top" : "left center",
+            });
             dots.forEach((d) => {
               if (d) gsap.set(d, { backgroundColor: "#e6ded3", scale: 1, boxShadow: "0 0 0 5px #fff, 0 0 0 0px rgba(232,116,36,.18)" });
             });
@@ -197,7 +204,7 @@ export function useScrollFx(refs: ScrollFxRefs) {
                 end: "bottom 30%",
                 scrub: 1,
                 onUpdate: (self) => {
-                  gsap.set(bar, { scaleX: self.progress });
+                  gsap.set(bar, { [barProp]: self.progress });
                   dots.forEach((d, i) => {
                     const active = self.progress >= i / (count - 1) - 0.02;
                     if (active === activeFlags[i]) return;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Barlow, Barlow_Condensed, Bebas_Neue } from "next/font/google";
 import "./globals.css";
+import CookieBanner from "./components/CookieBanner";
 
 const archivo = Archivo({
   variable: "--font-archivo",
@@ -38,7 +39,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="sl"
       className={`${archivo.variable} ${barlow.variable} ${barlowCondensed.variable} ${bebasNeue.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }

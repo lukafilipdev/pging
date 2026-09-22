@@ -5,6 +5,8 @@ import styles from "./page.module.css";
 import { heroMarks, principles, services, steps } from "./lib/data";
 import { useActiveSection, useHeaderSolid, useQuoteParallax, useReveal, useViewportHeightVar } from "./lib/hooks";
 import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
+import { OPEN_COOKIE_SETTINGS_EVENT } from "./lib/consent";
+import Link from "next/link";
 
 function Reveal({
   children,
@@ -982,44 +984,19 @@ export default function Home() {
             </h2>
           </Reveal>
           <div ref={stepsContainerRef} style={{ position: "relative", marginTop: "clamp(44px,6vw,72px)" }}>
-            <div style={{ position: "absolute", left: 0, right: 0, top: 5, height: 1, background: "#efe9e2" }} />
-            <div
-              ref={stepsBarRef}
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 5,
-                height: 1,
-                width: "100%",
-                background: "var(--accent)",
-                transform: "scaleX(1)",
-                transformOrigin: "left center",
-              }}
-            />
-            <div
-              style={{
-                position: "relative",
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,210px),1fr))",
-                gap: "clamp(28px,3.4vw,44px)",
-              }}
-            >
+            <div className={styles.stepsTrack} />
+            <div ref={stepsBarRef} className={styles.stepsBar} />
+            <div className={styles.stepsGrid}>
               {steps.map((st, i) => (
                 <Reveal key={st.num} delay={st.delay} style={{ paddingRight: "clamp(0px,1.5vw,24px)" }}>
+                  <div className={styles.stepItem}>
                   <span
                     ref={(el) => {
                       stepDotRefs.current[i] = el;
                     }}
-                    style={{
-                      display: "block",
-                      width: 11,
-                      height: 11,
-                      background: "var(--accent)",
-                      borderRadius: "50%",
-                      boxShadow: "0 0 0 5px #fff, 0 0 0 3px rgba(232,116,36,.18)",
-                      marginBottom: "clamp(22px,2.6vw,32px)",
-                    }}
+                    className={styles.stepDot}
                   />
+                  <div className={styles.stepItemBody}>
                   <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                     <span
                       ref={(el) => {
@@ -1041,6 +1018,8 @@ export default function Home() {
                     </span>
                   </div>
                   <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5a544c", margin: "14px 0 0", textWrap: "pretty" }}>{st.text}</p>
+                  </div>
+                  </div>
                 </Reveal>
               ))}
             </div>
@@ -1361,6 +1340,27 @@ export default function Home() {
             }}
           >
             <span>© 2026 PG INŽENIRING d.o.o. Vse pravice pridržane.</span>
+            <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
+              <Link href="/politika-zasebnosti" className={styles.footerLink} style={{ color: "#7d766d", fontSize: 13 }}>
+                Politika zasebnosti
+              </Link>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT))}
+                className={styles.footerLink}
+                style={{
+                  color: "#7d766d",
+                  fontSize: 13,
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+              >
+                Nastavitve piškotkov
+              </button>
+            </div>
             <span>Projektiranje · Gradnja · Nadzor</span>
           </div>
         </div>
