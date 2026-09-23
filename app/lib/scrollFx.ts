@@ -19,8 +19,6 @@ export interface ScrollFxRefs {
   principleDividers: RefObject<(HTMLDivElement | null)[]>;
   quoteSection: RefObject<HTMLElement | null>;
   quoteHeading: RefObject<HTMLDivElement | null>;
-  serviceRows: RefObject<(HTMLDivElement | null)[]>;
-  serviceLines: RefObject<(HTMLDivElement | null)[]>;
   stepsContainer: RefObject<HTMLDivElement | null>;
   stepsBar: RefObject<HTMLDivElement | null>;
   stepDots: RefObject<(HTMLSpanElement | null)[]>;
@@ -161,22 +159,6 @@ export function useScrollFx(refs: ScrollFxRefs) {
             );
             cleanups.push(() => tween.scrollTrigger?.kill());
           }
-
-          const rows = refs.serviceRows.current || [];
-          const lines = refs.serviceLines.current || [];
-          rows.forEach((row, i) => {
-            if (!row) return;
-            gsap.set(row, { opacity: 0.35, x: -12 });
-            const line = lines[i];
-            if (line) gsap.set(line, { scaleX: 0, transformOrigin: "left center" });
-            const tl = gsap.timeline({
-              scrollTrigger: { trigger: row, start: "top 88%", end: "bottom 12%", scrub: 1 },
-            });
-            tl.fromTo(row, { opacity: 0.35, x: -12 }, { opacity: 1, x: 0, ease: "none", duration: 0.5 }, 0);
-            tl.to(row, { opacity: 0.35, ease: "none", duration: 0.5 }, 0.5);
-            if (line) tl.fromTo(line, { scaleX: 0 }, { scaleX: 1, ease: "none", duration: 0.5 }, 0);
-            cleanups.push(() => tl.scrollTrigger?.kill());
-          });
 
           if (refs.stepsContainer.current && refs.stepsBar.current) {
             const bar = refs.stepsBar.current;

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent, type CSSProperties } from "react";
 import styles from "./page.module.css";
 import { heroMarks, principles, services, steps } from "./lib/data";
-import { useActiveSection, useHeaderSolid, useQuoteParallax, useReveal, useViewportHeightVar } from "./lib/hooks";
+import { useActiveSection, useCssVarFromHeight, useHeaderSolid, useQuoteParallax, useReveal, useViewportHeightVar } from "./lib/hooks";
 import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "./lib/consent";
 import Link from "next/link";
@@ -39,8 +39,6 @@ export default function Home() {
   const aboutImgRef = useRef<HTMLImageElement>(null);
   const aboutVignetteRef = useRef<HTMLDivElement>(null);
   const principleDividerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const serviceRowRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const serviceLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const stepsContainerRef = useRef<HTMLDivElement>(null);
   const stepsBarRef = useRef<HTMLDivElement>(null);
   const stepDotRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -49,6 +47,10 @@ export default function Home() {
   const contactCardRef = useRef<HTMLDivElement>(null);
   const contactGlowRef = useRef<HTMLDivElement>(null);
   const topBarRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const storitveScrollRef = useRef<HTMLDivElement>(null);
+  const storitvePanelRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const [activeService, setActiveService] = useState(0);
 
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
@@ -64,8 +66,38 @@ export default function Home() {
     };
   }, [menuOpen]);
 
+  useEffect(() => {
+    const root = storitveScrollRef.current;
+    const items = storitvePanelRefs.current;
+    if (!root || !items.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        let bestIndex = -1;
+        let bestRatio = 0;
+        entries.forEach((entry) => {
+          const idx = items.indexOf(entry.target as HTMLAnchorElement);
+          if (idx === -1) return;
+          if (entry.intersectionRatio > bestRatio) {
+            bestRatio = entry.intersectionRatio;
+            bestIndex = idx;
+          }
+        });
+        if (bestIndex !== -1) setActiveService(bestIndex);
+      },
+      { root, threshold: [0.5, 0.75, 1] }
+    );
+    items.forEach((el) => el && io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  function scrollToService(i: number) {
+    const el = storitvePanelRefs.current[i];
+    el?.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+  }
+
   const solid = useHeaderSolid(heroRef);
   useViewportHeightVar(heroRef);
+  useCssVarFromHeight(headerRef, "--header-h");
   const activeSection = useActiveSection(["top", "o-podjetju", "storitve", "kontakt"]);
   useQuoteParallax(quoteImgRef);
 
@@ -80,8 +112,6 @@ export default function Home() {
     principleDividers: principleDividerRefs,
     quoteSection: quoteSectionRef,
     quoteHeading: quoteHeadingRef,
-    serviceRows: serviceRowRefs,
-    serviceLines: serviceLineRefs,
     stepsContainer: stepsContainerRef,
     stepsBar: stepsBarRef,
     stepDots: stepDotRefs,
@@ -141,6 +171,7 @@ export default function Home() {
         />
       </div>
       <header
+        ref={headerRef}
         style={{
           position: "fixed",
           top: 0,
@@ -857,16 +888,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="storitve" style={{ background: "#fbfaf9", position: "relative" }}>
-        <div style={{ ...containerStyle, paddingTop: "clamp(72px,10vw,140px)", paddingBottom: "clamp(56px,7vw,110px)" }}>
-          <Reveal
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,280px),1fr))",
-              gap: "clamp(20px,4vw,60px)",
-              alignItems: "end",
-            }}
-          >
+      <section id="storitve" className={styles.storitveSection} style={{ background: "#fbfaf9", position: "relative" }}>
+        <div
+          className={styles.storitveIntroWrap}
+          style={{
+            paddingLeft: "clamp(20px,5vw,40px)",
+            paddingRight: "clamp(20px,5vw,40px)",
+          }}
+        >
+          <Reveal style={{ width: "100%" }}>
+            <div className={styles.storitveIntroRow}>
             <div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 <span className="font-archivo" style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".12em", color: "#cfc7bd" }}>
@@ -883,10 +914,10 @@ export default function Home() {
                 className="font-archivo"
                 style={{
                   fontWeight: 700,
-                  fontSize: "clamp(32px,4.4vw,58px)",
+                  fontSize: "clamp(26px,4.4vw,58px)",
                   lineHeight: 1.04,
                   letterSpacing: "-.028em",
-                  margin: "20px 0 0",
+                  margin: "10px 0 0",
                   textWrap: "balance",
                 }}
               >
@@ -895,63 +926,178 @@ export default function Home() {
                 en partner.
               </h2>
             </div>
-            <p style={{ fontSize: "clamp(15px,1.2vw,17px)", lineHeight: 1.75, color: "#7d766d", margin: 0, maxWidth: "44ch", textWrap: "pretty" }}>
-              Vsako od njih lahko prevzamemo posamično — največ pa vam prihranimo, ko jih združimo v eno
-              pot od načrta do predaje.
-            </p>
-          </Reveal>
-
-          <div style={{ marginTop: "clamp(44px,6vw,80px)", borderTop: "1px solid #e9e2d9" }}>
-            {services.map((s, i) => (
-              <div
-                key={s.num}
-                ref={(el) => {
-                  serviceRowRefs.current[i] = el;
-                }}
-                className={styles.serviceCard}
+            <div style={{ display: "flex", gap: "clamp(20px,3vw,36px)", alignItems: "flex-start" }}>
+              <span style={{ display: "block", width: 1, alignSelf: "stretch", background: "#e9e2d9", flexShrink: 0 }} aria-hidden />
+              <p
+                className={styles.storitveIntroText}
+                style={{ fontSize: "clamp(14px,1.2vw,17px)", lineHeight: 1.6, color: "#7d766d", margin: 0, maxWidth: "40ch", textWrap: "pretty" }}
+              >
+                Od prve ideje do predaje objekta. Povezujemo znanje, izkušnje in odgovornost, da lahko vaš
+                projekt poteka enostavno, varno in zanesljivo.
+              </p>
+            </div>
+            <div className={styles.storitveCtaDesktop} style={{ flexDirection: "column" }}>
+              <span style={{ display: "block", width: "100%", height: 1, background: "#e9e2d9" }} />
+              <a
+                href="#kontakt"
+                className={styles.storitveCtaLink}
                 style={{
-                  position: "relative",
-                  borderBottom: "1px solid #e9e2d9",
-                  padding: "clamp(28px,3.4vw,44px) clamp(4px,1.4vw,22px)",
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,260px),1fr))",
-                  gap: "clamp(18px,3vw,48px)",
-                  alignItems: "start",
-                  opacity: 1,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 10,
+                  width: "100%",
+                  padding: "16px clamp(8px,2vw,28px)",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <div
+                <span
+                  className="font-barlow-condensed"
+                  style={{ fontSize: 13, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "#26231f" }}
+                >
+                  Več o storitvah
+                </span>
+                <span aria-hidden className={styles.ctaArrow} style={{ display: "inline-flex", alignItems: "center", color: "var(--accent)" }}>
+                  <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
+                    <path
+                      d="M1 6H15M15 6L10 1M15 6L10 11"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </a>
+              <span style={{ display: "block", width: "100%", height: 1, background: "#e9e2d9" }} />
+            </div>
+            </div>
+          </Reveal>
+        </div>
+
+        <div className={styles.storitveTabs}>
+          {services.map((s, i) => (
+            <button
+              key={s.num}
+              type="button"
+              onClick={() => scrollToService(i)}
+              className={styles.storitveTab}
+              data-active={activeService === i}
+            >
+              <span className={styles.storitveTabNum}>{s.num}</span>
+              <span className={styles.storitveTabTitle}>{s.title}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.storitvePanelsWrap}>
+          <div className={styles.storitvePanels} ref={storitveScrollRef}>
+            {services.map((s, i) => (
+              <Reveal key={s.num} delay={s.delay} style={{ height: "100%" }}>
+                <a
+                  href="#kontakt"
+                  className={styles.servicePanel}
                   ref={(el) => {
-                    serviceLineRefs.current[i] = el;
+                    storitvePanelRefs.current[i] = el;
                   }}
-                  className={styles.cardBar}
-                  style={{ position: "absolute", left: 0, right: 0, bottom: -1, height: 2, background: "var(--accent)" }}
-                />
-                <div style={{ display: "flex", alignItems: "baseline", gap: "clamp(14px,2vw,26px)" }}>
-                  <div
-                    className="font-archivo"
-                    style={{ fontWeight: 700, fontSize: "clamp(28px,3.4vw,46px)", lineHeight: 0.9, letterSpacing: "-.03em", color: "#dcd4c9" }}
-                  >
+                >
+                  <img src={s.image} alt={s.alt} className={styles.servicePanelImg} />
+                  <div className={styles.servicePanelOverlay} aria-hidden />
+                  <div className={`font-archivo ${styles.servicePanelNum}`} aria-hidden>
                     {s.num}
                   </div>
-                  <h3 className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(26px,3vw,40px)", lineHeight: 1.02, letterSpacing: "-.028em", margin: 0 }}>
-                    {s.title}
-                  </h3>
-                </div>
-                <p style={{ fontSize: "clamp(15px,1.2vw,17px)", lineHeight: 1.75, color: "#5a544c", margin: 0, maxWidth: "42ch", textWrap: "pretty" }}>
-                  {s.text}
-                </p>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-                  {s.items.map((it) => (
-                    <li key={it} style={{ display: "flex", gap: 12, alignItems: "flex-start", fontSize: 15, color: "#4a453f", lineHeight: 1.5 }}>
-                      <span style={{ flexShrink: 0, width: 5, height: 5, background: "var(--accent)", marginTop: 8, borderRadius: "50%" }} />
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  <div className={styles.servicePanelBody}>
+                    <span style={{ display: "block", width: 32, height: 2, background: "var(--accent)", marginBottom: 16 }} />
+                    <h3
+                      className="font-archivo"
+                      style={{
+                        fontWeight: 700,
+                        fontSize: "clamp(24px,2.4vw,32px)",
+                        lineHeight: 1.05,
+                        letterSpacing: "-.02em",
+                        textTransform: "uppercase",
+                        color: "#fff",
+                        margin: 0,
+                      }}
+                    >
+                      {s.title}
+                    </h3>
+                    <p
+                      className="font-barlow-condensed"
+                      style={{
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        letterSpacing: ".1em",
+                        textTransform: "uppercase",
+                        lineHeight: 1.6,
+                        color: "rgba(255,255,255,.78)",
+                        margin: "12px 0 0",
+                      }}
+                    >
+                      {s.tagline}
+                    </p>
+                    <ul style={{ listStyle: "none", padding: 0, margin: "22px 0 0", display: "flex", flexDirection: "column", gap: 10 }}>
+                      {s.items.map((it) => (
+                        <li key={it} style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 14, color: "rgba(255,255,255,.88)", lineHeight: 1.5 }}>
+                          <span style={{ flexShrink: 0, width: 4, height: 4, background: "var(--accent)", marginTop: 7, borderRadius: "50%" }} />
+                          <span>{it}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <span className={styles.servicePanelCta}>
+                      <span
+                        className="font-barlow-condensed"
+                        style={{
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          letterSpacing: ".12em",
+                          textTransform: "uppercase",
+                          color: "#fff",
+                          paddingBottom: 4,
+                          borderBottom: "1px solid rgba(255,255,255,.5)",
+                        }}
+                      >
+                        Več
+                      </span>
+                      <span aria-hidden className={styles.ctaArrow} style={{ display: "inline-flex", alignItems: "center", color: "#fff" }}>
+                        <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
+                          <path
+                            d="M1 6H15M15 6L10 1M15 6L10 11"
+                            stroke="currentColor"
+                            strokeWidth="1.4"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </span>
+                  </div>
+                </a>
+              </Reveal>
             ))}
           </div>
+        </div>
+
+        <div className={styles.storitveCtaMobile}>
+          <a href="#kontakt" style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+            <span
+              className="font-barlow-condensed"
+              style={{ fontSize: 13, fontWeight: 600, letterSpacing: ".14em", textTransform: "uppercase", color: "#26231f" }}
+            >
+              Več o storitvah
+            </span>
+            <span aria-hidden className={styles.ctaArrow} style={{ display: "inline-flex", alignItems: "center", color: "var(--accent)" }}>
+              <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
+                <path
+                  d="M1 6H15M15 6L10 1M15 6L10 11"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </a>
         </div>
       </section>
 

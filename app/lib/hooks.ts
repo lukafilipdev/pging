@@ -76,6 +76,24 @@ export function useViewportHeightVar(ref: RefObject<HTMLElement | null>) {
   }, [ref]);
 }
 
+export function useCssVarFromHeight(ref: RefObject<HTMLElement | null>, varName: string) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const setVar = () => {
+      document.documentElement.style.setProperty(varName, `${el.offsetHeight}px`);
+    };
+    setVar();
+    const ro = new ResizeObserver(setVar);
+    ro.observe(el);
+    window.addEventListener("resize", setVar);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", setVar);
+    };
+  }, [ref, varName]);
+}
+
 export function useHeaderSolid(heroRef: RefObject<HTMLElement | null>) {
   const [solid, setSolid] = useState(false);
 
