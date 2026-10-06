@@ -28,9 +28,9 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "PG INŽENIRING d.o.o. — Projektiranje, gradnja, nadzor",
+  title: "PG INŽENIRING d.o.o. | Projektiranje, gradnja, nadzor",
   description:
-    "Majhno inženirsko podjetje z osebnim pristopom. Od prve ideje in projektne dokumentacije do izvedbe in strokovnega nadzora nad gradnjo — vse na enem mestu.",
+    "Majhno inženirsko podjetje z osebnim pristopom. Od prve ideje in projektne dokumentacije do izvedbe in strokovnega nadzora nad gradnjo. Vse na enem mestu.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

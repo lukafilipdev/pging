@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent, type CSSProperties } from "react";
 import styles from "./page.module.css";
 import { heroMarks, principles, services, steps } from "./lib/data";
 import { useActiveSection, useCssVarFromHeight, useHeaderSolid, useQuoteParallax, useReveal, useViewportHeightVar } from "./lib/hooks";
 import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "./lib/consent";
 import Link from "next/link";
+import ServiceSheet from "./components/ServiceSheet";
 
 function Reveal({
   children,
@@ -49,8 +50,10 @@ export default function Home() {
   const topBarRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
   const storitveScrollRef = useRef<HTMLDivElement>(null);
-  const storitvePanelRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const storitvePanelRefs = useRef<(HTMLElement | null)[]>([]);
   const [activeService, setActiveService] = useState(0);
+  const [openService, setOpenService] = useState<number | null>(null);
+  const closeService = useCallback(() => setOpenService(null), []);
 
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
@@ -75,7 +78,7 @@ export default function Home() {
         let bestIndex = -1;
         let bestRatio = 0;
         entries.forEach((entry) => {
-          const idx = items.indexOf(entry.target as HTMLAnchorElement);
+          const idx = items.indexOf(entry.target as HTMLElement);
           if (idx === -1) return;
           if (entry.intersectionRatio > bestRatio) {
             bestRatio = entry.intersectionRatio;
@@ -129,6 +132,7 @@ export default function Home() {
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    e.currentTarget.reset();
     setSent(true);
   }
 
@@ -215,13 +219,12 @@ export default function Home() {
                 color: inkLabelColor,
                 textTransform: "uppercase",
                 lineHeight: 1.2,
+                whiteSpace: "nowrap",
                 textShadow: headerTextShadow,
                 transition: "color .5s ease",
               }}
             >
-              Inženiring
-              <br />
-              d.o.o.
+              Inženiring d.o.o.
             </span>
           </a>
           <div className={styles.navLinks} style={{ transform: "translateX(clamp(0px,2vw,32px))" }}>
@@ -686,14 +689,10 @@ export default function Home() {
 
       <section id="o-podjetju" ref={aboutSectionRef} className={styles.aboutSection}>
         <div
-          style={{
-            ...containerStyle,
-            paddingTop: "clamp(64px,9vw,120px)",
-            paddingBottom: "clamp(64px,9vw,120px)",
-          }}
+          style={containerStyle}
           className={styles.aboutGrid}
         >
-          <div>
+          <div className={styles.aboutText}>
             <Reveal>
               <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                 <span className="font-archivo" style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".12em", color: "#cfc7bd" }}>
@@ -712,14 +711,16 @@ export default function Home() {
                 className="font-archivo"
                 style={{
                   fontWeight: 700,
-                  fontSize: "clamp(30px,3.6vw,48px)",
-                  lineHeight: 1.06,
-                  letterSpacing: "-.028em",
-                  margin: "16px 0 0",
+                  fontSize: "clamp(30px,3.9vw,58px)",
+                  lineHeight: 1.04,
+                  letterSpacing: "-.03em",
+                  margin: "18px 0 0",
                   textWrap: "balance",
                 }}
               >
-                Najprej poslušamo, <span style={{ color: "var(--accent)" }}>šele nato rišemo.</span>
+                Najprej poslušamo,
+                <br />
+                <span style={{ color: "var(--accent)" }}>šele nato načrtujemo.</span>
               </h2>
               <div style={{ width: 56, height: 2, background: "var(--accent)", marginTop: 22 }} />
             </Reveal>
@@ -727,50 +728,21 @@ export default function Home() {
             <Reveal delay={170}>
               <p
                 style={{
-                  fontSize: "clamp(17px,1.5vw,21px)",
+                  fontSize: "clamp(16px,1.3vw,19px)",
                   lineHeight: 1.75,
                   color: "#5a544c",
-                  margin: "28px 0 0",
-                  maxWidth: "54ch",
+                  margin: "30px 0 0",
+                  maxWidth: "50ch",
                   textWrap: "pretty",
                 }}
               >
-                PG INŽENIRING d.o.o. je majhno podjetje iz Gornjih Slavečev v Prekmurju, ki projektira, gradi
-                in nadzira vse vrste objektov — vse pod eno streho. Pri izdelavi dokumentacije upoštevamo
-                vaše želje, ne le svoje izkušnje, in ostajamo v neposrednem stiku z vami od prvega obiska
-                parcele do predaje ključev.
+                PG INŽENIRING d.o.o. je majhno podjetje iz Gornjih Slaveč v Prekmurju, katero projektira,
+                gradi in nadzira vse vrste objektov, pod eno streho. Vaše želje povezujemo z našim znanjem
+                in izkušnjami ter vas osebno vodimo skozi celoten proces, od prvega ogleda parcele do
+                trenutka, ko vam predamo ključe vašega novega doma.
               </p>
             </Reveal>
 
-            <div className={styles.principlesGrid} style={{ marginTop: "clamp(40px,5vw,64px)" }}>
-              {principles.map((p, i) => (
-                <Reveal key={p.title} delay={220 + p.delay}>
-                  <div className={styles.principleCard}>
-                    <div
-                      className={`font-archivo ${styles.principleNum}`}
-                      style={{ fontWeight: 700, fontSize: "clamp(22px,2.2vw,28px)", letterSpacing: "-.02em", color: "#cfc7bd" }}
-                    >
-                      {p.num}
-                    </div>
-                    <div
-                      className="font-archivo"
-                      style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-.01em", marginTop: 8 }}
-                    >
-                      {p.title}
-                    </div>
-                    <div
-                      ref={(el) => {
-                        principleDividerRefs.current[i] = el;
-                      }}
-                      style={{ width: 28, height: 2, background: "var(--accent)", marginTop: 10 }}
-                    />
-                    <div style={{ fontSize: 14, lineHeight: 1.55, color: "#7d766d", marginTop: 8, textWrap: "pretty" }}>
-                      {p.text}
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
           </div>
 
           <Reveal delay={140}>
@@ -816,6 +788,24 @@ export default function Home() {
               </div>
             </div>
           </Reveal>
+
+          <div className={styles.aboutPoints}>
+            {principles.map((p, i) => (
+              <Reveal key={p.title} delay={120 + p.delay}>
+                <div className={styles.aboutPoint}>
+                  <span className={`font-archivo ${styles.aboutPointNum}`}>{p.num}</span>
+                  <h3 className={`font-archivo ${styles.aboutPointTitle}`}>{p.title}</h3>
+                  <div
+                    ref={(el) => {
+                      principleDividerRefs.current[i] = el;
+                    }}
+                    className={styles.aboutPointRule}
+                  />
+                  <p className={styles.aboutPointText}>{p.text}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -831,7 +821,7 @@ export default function Home() {
             height: "100%",
             objectFit: "cover",
             objectPosition: "55% 30%",
-            opacity: 0.4,
+            opacity: 0.9,
             transform: "scale(1.08)",
             willChange: "transform",
           }}
@@ -840,7 +830,8 @@ export default function Home() {
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(100deg, rgba(14,11,8,.94) 0%, rgba(14,11,8,.78) 46%, rgba(14,11,8,.5) 100%)",
+            background:
+              "linear-gradient(180deg, rgba(14,11,8,.34) 0%, rgba(14,11,8,0) 22%, rgba(14,11,8,0) 70%, rgba(14,11,8,.42) 100%), linear-gradient(100deg, rgba(14,11,8,.86) 0%, rgba(14,11,8,.7) 34%, rgba(14,11,8,.36) 64%, rgba(14,11,8,.12) 100%)",
             pointerEvents: "none",
           }}
         />
@@ -868,8 +859,9 @@ export default function Home() {
                 textWrap: "pretty",
               }}
             >
-              Vsaka hiša, ki jo narišemo, bo nekoga dom. Zato se za vsak načrt{" "}
-              <span style={{ color: "var(--accent-light)" }}>usedemo za mizo</span> — z vami, ne brez vas.
+              Najboljši projekti nastanejo, ko se{" "}
+              <span style={{ color: "var(--accent-light)" }}>vaše želje</span> srečajo z našim znanjem,
+              izkušnjami in odgovornostjo.
             </blockquote>
             <div
               className="font-barlow-condensed"
@@ -923,7 +915,7 @@ export default function Home() {
               >
                 Tri storitve,
                 <br />
-                en partner.
+                za vaš projekt.
               </h2>
             </div>
             <div style={{ display: "flex", gap: "clamp(20px,3vw,36px)", alignItems: "flex-start" }}>
@@ -994,8 +986,7 @@ export default function Home() {
           <div className={styles.storitvePanels} ref={storitveScrollRef}>
             {services.map((s, i) => (
               <Reveal key={s.num} delay={s.delay} style={{ height: "100%" }}>
-                <a
-                  href="#kontakt"
+                <article
                   className={styles.servicePanel}
                   ref={(el) => {
                     storitvePanelRefs.current[i] = el;
@@ -1003,62 +994,33 @@ export default function Home() {
                 >
                   <img src={s.image} alt={s.alt} className={styles.servicePanelImg} />
                   <div className={styles.servicePanelOverlay} aria-hidden />
-                  <div className={`font-archivo ${styles.servicePanelNum}`} aria-hidden>
-                    {s.num}
+                  <div className={styles.servicePanelHead} aria-hidden>
+                    <span className={`font-archivo ${styles.servicePanelNum}`}>{s.num}</span>
+                    <span className={styles.servicePanelRule} />
+                    <span className={`font-barlow-condensed ${styles.servicePanelTotal}`}>
+                      / {String(services.length).padStart(2, "0")}
+                    </span>
                   </div>
                   <div className={styles.servicePanelBody}>
-                    <span style={{ display: "block", width: 32, height: 2, background: "var(--accent)", marginBottom: 16 }} />
-                    <h3
-                      className="font-archivo"
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "clamp(24px,2.4vw,32px)",
-                        lineHeight: 1.05,
-                        letterSpacing: "-.02em",
-                        textTransform: "uppercase",
-                        color: "#fff",
-                        margin: 0,
-                      }}
-                    >
-                      {s.title}
-                    </h3>
-                    <p
-                      className="font-barlow-condensed"
-                      style={{
-                        fontSize: 12.5,
-                        fontWeight: 600,
-                        letterSpacing: ".1em",
-                        textTransform: "uppercase",
-                        lineHeight: 1.6,
-                        color: "rgba(255,255,255,.78)",
-                        margin: "12px 0 0",
-                      }}
-                    >
-                      {s.tagline}
-                    </p>
-                    <ul style={{ listStyle: "none", padding: 0, margin: "22px 0 0", display: "flex", flexDirection: "column", gap: 10 }}>
+                    <span className={styles.servicePanelAccent} aria-hidden />
+                    <h3 className={`font-archivo ${styles.servicePanelTitle}`}>{s.title}</h3>
+                    <p className={`font-barlow-condensed ${styles.servicePanelTagline}`}>{s.tagline}</p>
+                    <ul className={styles.servicePanelList}>
                       {s.items.map((it) => (
-                        <li key={it} style={{ display: "flex", gap: 10, alignItems: "flex-start", fontSize: 14, color: "rgba(255,255,255,.88)", lineHeight: 1.5 }}>
-                          <span style={{ flexShrink: 0, width: 4, height: 4, background: "var(--accent)", marginTop: 7, borderRadius: "50%" }} />
+                        <li key={it}>
+                          <span className={styles.servicePanelDot} aria-hidden />
                           <span>{it}</span>
                         </li>
                       ))}
                     </ul>
-                    <span className={styles.servicePanelCta}>
-                      <span
-                        className="font-barlow-condensed"
-                        style={{
-                          fontSize: 12.5,
-                          fontWeight: 600,
-                          letterSpacing: ".12em",
-                          textTransform: "uppercase",
-                          color: "#fff",
-                          paddingBottom: 4,
-                          borderBottom: "1px solid rgba(255,255,255,.5)",
-                        }}
-                      >
-                        Več
-                      </span>
+                    <button
+                      type="button"
+                      className={styles.servicePanelCta}
+                      onClick={() => setOpenService(i)}
+                      aria-haspopup="dialog"
+                      aria-label={`Več o storitvi ${s.title}`}
+                    >
+                      <span className={`font-barlow-condensed ${styles.servicePanelCtaLabel}`}>Več</span>
                       <span aria-hidden className={styles.ctaArrow} style={{ display: "inline-flex", alignItems: "center", color: "#fff" }}>
                         <svg width="15" height="11" viewBox="0 0 16 12" fill="none">
                           <path
@@ -1070,13 +1032,15 @@ export default function Home() {
                           />
                         </svg>
                       </span>
-                    </span>
+                    </button>
                   </div>
-                </a>
+                </article>
               </Reveal>
             ))}
           </div>
         </div>
+
+        <ServiceSheet index={openService} onClose={closeService} onNavigate={setOpenService} />
 
         <div className={styles.storitveCtaMobile}>
           <a href="#kontakt" style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
@@ -1134,37 +1098,27 @@ export default function Home() {
             <div ref={stepsBarRef} className={styles.stepsBar} />
             <div className={styles.stepsGrid}>
               {steps.map((st, i) => (
-                <Reveal key={st.num} delay={st.delay} style={{ paddingRight: "clamp(0px,1.5vw,24px)" }}>
+                <Reveal key={st.num} delay={st.delay}>
                   <div className={styles.stepItem}>
-                  <span
-                    ref={(el) => {
-                      stepDotRefs.current[i] = el;
-                    }}
-                    className={styles.stepDot}
-                  />
-                  <div className={styles.stepItemBody}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
                     <span
                       ref={(el) => {
-                        stepNumRefs.current[i] = el;
+                        stepDotRefs.current[i] = el;
                       }}
-                      className="font-archivo"
-                      style={{
-                        fontWeight: 700,
-                        fontSize: "clamp(30px,3vw,40px)",
-                        lineHeight: 0.9,
-                        letterSpacing: "-.03em",
-                        color: "#dcd4c9",
-                      }}
-                    >
-                      {st.num}
-                    </span>
-                    <span className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(19px,1.7vw,23px)", letterSpacing: "-.015em" }}>
-                      {st.title}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5a544c", margin: "14px 0 0", textWrap: "pretty" }}>{st.text}</p>
-                  </div>
+                      className={styles.stepDot}
+                    />
+                    <div className={styles.stepItemBody}>
+                      <span
+                        ref={(el) => {
+                          stepNumRefs.current[i] = el;
+                        }}
+                        className={`font-archivo ${styles.stepNum}`}
+                        style={{ color: "#f0a46b" }}
+                      >
+                        {st.num}
+                      </span>
+                      <h3 className={`font-archivo ${styles.stepTitle}`}>{st.title}</h3>
+                      <p className={styles.stepText}>{st.text}</p>
+                    </div>
                   </div>
                 </Reveal>
               ))}
@@ -1175,13 +1129,11 @@ export default function Home() {
 
       <section id="kontakt" ref={contactSectionRef} style={{ background: "#fbfaf9", borderTop: "1px solid #f0ebe5", position: "relative" }}>
         <div
+          className={styles.contactGrid}
           style={{
             ...containerStyle,
             paddingTop: "clamp(64px,9vw,120px)",
             paddingBottom: "clamp(64px,9vw,120px)",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,320px),1fr))",
-            gap: "clamp(36px,5vw,72px)",
           }}
         >
           <Reveal>
@@ -1210,7 +1162,7 @@ export default function Home() {
               Pogovorimo se o vaši investiciji
             </h2>
             <p style={{ fontSize: "clamp(16px,1.3vw,19px)", lineHeight: 1.7, color: "#5a544c", margin: "0 0 clamp(34px,4vw,48px)", maxWidth: "44ch", textWrap: "pretty" }}>
-              Pokličite ali pišite — svetujemo vam že pred začetkom, brezplačno in brez obveznosti.
+              Pokličite ali pišite. Svetujemo vam že pred začetkom, brezplačno in brez obveznosti.
             </p>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -1224,18 +1176,6 @@ export default function Home() {
                 </span>
                 <span className="font-archivo" style={{ fontWeight: 600, fontSize: "clamp(18px,1.7vw,23px)", letterSpacing: "-.015em" }}>
                   070 799 810
-                </span>
-              </a>
-              <a
-                href="tel:059942613"
-                className={styles.contactLine}
-                style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "20px 2px", borderTop: "1px solid #e9e2d9", color: "#26231f" }}
-              >
-                <span className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#a09889" }}>
-                  Telefon
-                </span>
-                <span className="font-archivo" style={{ fontWeight: 600, fontSize: "clamp(18px,1.7vw,23px)", letterSpacing: "-.015em" }}>
-                  05 994 26 13
                 </span>
               </a>
               <a
@@ -1267,138 +1207,88 @@ export default function Home() {
                 <span style={{ fontSize: 16, lineHeight: 1.5, textAlign: "right", color: "#4a453f" }}>
                   PG INŽENIRING d.o.o.
                   <br />
-                  Kuzma 24, 9263 Kuzma
+                  Gornji Slaveči 97, 9263 Kuzma
                 </span>
               </div>
             </div>
           </Reveal>
 
-          <div ref={contactCardRef} style={{ position: "relative", opacity: 1 }}>
-            <div
-              ref={contactGlowRef}
-              aria-hidden
+          <div ref={contactCardRef} className={styles.contactFormCol} style={{ opacity: 1 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <span style={{ display: "block", width: 32, height: 2, background: "var(--accent)" }} />
+              <span
+                className="font-barlow-condensed"
+                style={{ fontSize: 13, letterSpacing: ".26em", textTransform: "uppercase", color: "#a09889" }}
+              >
+                Povpraševanje
+              </span>
+            </div>
+            <h3
+              className="font-archivo"
               style={{
-                position: "absolute",
-                inset: "-10%",
-                opacity: 0,
-                background: "radial-gradient(60% 60% at 50% 60%, rgba(232,116,36,.45) 0%, rgba(232,116,36,0) 70%)",
-                filter: "blur(30px)",
-                pointerEvents: "none",
-                zIndex: 0,
-              }}
-            />
-            <form
-              onSubmit={handleSubmit}
-              style={{
-                position: "relative",
-                zIndex: 1,
-                background: "#fff",
-                border: "1px solid #eee7e0",
-                borderRadius: 3,
-                padding: "clamp(26px,3.4vw,44px)",
-                display: "flex",
-                flexDirection: "column",
-                gap: 20,
-                boxShadow: "0 40px 80px -60px rgba(38,35,31,.5)",
+                fontWeight: 700,
+                fontSize: "clamp(26px,2.6vw,38px)",
+                lineHeight: 1.08,
+                letterSpacing: "-.025em",
+                margin: "18px 0 0",
+                color: "#26231f",
               }}
             >
-              <div>
-                <div className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(21px,1.9vw,26px)", letterSpacing: "-.018em" }}>
-                  Pošljite povpraševanje
-                </div>
-                <div style={{ fontSize: 14, color: "#8a8378", marginTop: 8, lineHeight: 1.55 }}>
-                  Odgovorimo v enem delovnem dnevu.
-                </div>
+              Povejte nam, kaj načrtujete.
+            </h3>
+            <p style={{ fontSize: 15, lineHeight: 1.6, color: "#7d766d", margin: "12px 0 0", maxWidth: "46ch" }}>
+              Odgovorimo v enem delovnem dnevu.
+            </p>
+
+            <form onSubmit={handleSubmit} className={styles.contactForm}>
+              <div className={`${styles.fieldWrap} ${styles.fieldFull}`}>
+                <label htmlFor="kf-ime" className={`font-barlow-condensed ${styles.fieldLabel}`}>
+                  Ime in priimek
+                </label>
+                <input id="kf-ime" name="ime" type="text" required autoComplete="name" className={styles.fieldInput} />
               </div>
-              <label style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a8378" }}>
-                Ime in priimek
-                <input
-                  name="ime"
-                  required
-                  className={styles.field}
-                  style={{
-                    background: "#fff",
-                    border: "1px solid #e4ddd5",
-                    borderRadius: 2,
-                    padding: "14px 15px",
-                    fontSize: 16,
-                    letterSpacing: "normal",
-                    textTransform: "none",
-                    color: "#26231f",
-                  }}
-                />
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a8378" }}>
-                E-pošta ali telefon
-                <input
-                  name="kontakt"
-                  required
-                  className={styles.field}
-                  style={{
-                    background: "#fff",
-                    border: "1px solid #e4ddd5",
-                    borderRadius: 2,
-                    padding: "14px 15px",
-                    fontSize: 16,
-                    letterSpacing: "normal",
-                    textTransform: "none",
-                    color: "#26231f",
-                  }}
-                />
-              </label>
-              <label style={{ display: "flex", flexDirection: "column", gap: 7, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: "#8a8378" }}>
-                Kaj načrtujete?
-                <textarea
-                  name="sporocilo"
-                  rows={4}
-                  className={styles.field}
-                  style={{
-                    background: "#fff",
-                    border: "1px solid #e4ddd5",
-                    borderRadius: 2,
-                    padding: "14px 15px",
-                    fontSize: 16,
-                    letterSpacing: "normal",
-                    textTransform: "none",
-                    color: "#26231f",
-                    resize: "vertical",
-                    fontFamily: "var(--font-barlow), sans-serif",
-                  }}
-                />
-              </label>
-              <button
-                type="submit"
-                className={styles.submitBtn}
-                style={{
-                  background: "var(--accent)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 2,
-                  padding: "16px 22px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  letterSpacing: ".1em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                }}
-              >
-                Pošlji povpraševanje
-              </button>
-              {sent && (
-                <div
-                  style={{
-                    background: "#fff",
-                    border: "1px solid #dfe8dc",
-                    borderRadius: 2,
-                    padding: "14px 16px",
-                    fontSize: 15,
-                    color: "#42603b",
-                    animation: "pgUp .4s ease both",
-                  }}
-                >
-                  Hvala, sporočilo je zabeleženo. Oglasili se bomo v najkrajšem času.
-                </div>
-              )}
+              <div className={styles.fieldWrap}>
+                <label htmlFor="kf-email" className={`font-barlow-condensed ${styles.fieldLabel}`}>
+                  E-pošta
+                </label>
+                <input id="kf-email" name="email" type="email" required autoComplete="email" className={styles.fieldInput} />
+              </div>
+              <div className={styles.fieldWrap}>
+                <label htmlFor="kf-tel" className={`font-barlow-condensed ${styles.fieldLabel}`}>
+                  Telefon
+                </label>
+                <input id="kf-tel" name="telefon" type="tel" autoComplete="tel" className={styles.fieldInput} />
+              </div>
+              <div className={`${styles.fieldWrap} ${styles.fieldFull}`}>
+                <label htmlFor="kf-opis" className={`font-barlow-condensed ${styles.fieldLabel}`}>
+                  Kratek opis projekta
+                </label>
+                <textarea id="kf-opis" name="sporocilo" rows={3} className={`${styles.fieldInput} ${styles.fieldTextarea}`} />
+              </div>
+
+              <div className={`${styles.formFooter} ${styles.fieldFull}`}>
+                <button type="submit" className={`font-archivo ${styles.formSubmit}`}>
+                  Pošlji povpraševanje
+                  <span className={styles.formSubmitArrow} aria-hidden>
+                    →
+                  </span>
+                </button>
+                <p className={styles.formNote}>
+                  Z oddajo se strinjate z našo{" "}
+                  <a href="/politika-zasebnosti" className={styles.formNoteLink}>
+                    politiko zasebnosti
+                  </a>
+                  .
+                </p>
+              </div>
+
+              <div className={styles.fieldFull} role="status" aria-live="polite">
+                {sent && (
+                  <p className={styles.formSuccess}>
+                    Hvala, sporočilo je zabeleženo. Oglasili se bomo v najkrajšem času.
+                  </p>
+                )}
+              </div>
             </form>
           </div>
         </div>
@@ -1421,7 +1311,7 @@ export default function Home() {
               PG INŽENIRING d.o.o.
             </div>
             <div style={{ fontSize: 15, lineHeight: 1.7, color: "#9a938a", marginTop: 12 }}>
-              Kuzma 24, 9263 Kuzma
+              Gornji Slaveči 97, 9263 Kuzma
               <br />
               Prekmurje, Slovenija
             </div>
@@ -1446,9 +1336,6 @@ export default function Home() {
             </div>
             <a href="tel:070799810" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
               070 799 810
-            </a>
-            <a href="tel:059942613" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
-              05 994 26 13
             </a>
             <a href="mailto:info@pg-inzeniring.si" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15, wordBreak: "break-word" }}>
               info@pg-inzeniring.si

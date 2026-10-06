@@ -45,7 +45,7 @@ export function useScrollFx(refs: ScrollFxRefs) {
         {
           motionOK: "(prefers-reduced-motion: no-preference)",
           isDesktop: "(min-width: 900px)",
-          isStepsVertical: "(max-width: 680px)",
+          isStepsVertical: "(max-width: 859px)",
         },
         (context) => {
           const { motionOK, isDesktop, isStepsVertical } = (context.conditions ?? {}) as Record<string, boolean>;
@@ -176,7 +176,7 @@ export function useScrollFx(refs: ScrollFxRefs) {
               if (d) gsap.set(d, { backgroundColor: "#e6ded3", scale: 1, boxShadow: "0 0 0 5px #fff, 0 0 0 0px rgba(232,116,36,.18)" });
             });
             nums.forEach((n) => {
-              if (n) gsap.set(n, { color: "#e6ded3" });
+              if (n) gsap.set(n, { color: "#e9e2d8" });
             });
             if (count > 1) {
               const activeFlags = new Array(count).fill(false);
@@ -204,7 +204,7 @@ export function useScrollFx(refs: ScrollFxRefs) {
                       });
                     }
                     const n = nums[i];
-                    if (n) gsap.to(n, { color: active ? "#dcd4c9" : "#e6ded3", duration: 0.45, overwrite: true });
+                    if (n) gsap.to(n, { color: active ? "#f0a46b" : "#e9e2d8", duration: 0.6, overwrite: true });
                   });
                 },
               });

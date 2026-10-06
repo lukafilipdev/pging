@@ -112,22 +112,97 @@
 .stepsGrid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
-  gap: clamp(28px, 3.4vw, 44px);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(28px, 3.4vw, 52px);
+}
+
+.stepItem {
+  position: relative;
 }
 
 .stepDot {
+  position: relative;
   display: block;
   width: 11px;
   height: 11px;
   background: var(--accent);
   border-radius: 50%;
   box-shadow: 0 0 0 5px #fff, 0 0 0 3px rgba(232, 116, 36, 0.18);
-  margin-bottom: clamp(22px, 2.6vw, 32px);
+  margin-bottom: clamp(26px, 3vw, 40px);
   flex-shrink: 0;
 }
 
-@media (max-width: 680px) {
+.stepDot::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  transform: scale(0.55);
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+}
+
+.stepItemBody {
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.stepNum {
+  display: block;
+  font-weight: 600;
+  font-size: clamp(46px, 4.8vw, 72px);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepTitle {
+  position: relative;
+  display: inline-block;
+  margin: clamp(14px, 1.6vw, 22px) 0 0;
+  font-weight: 700;
+  font-size: clamp(20px, 1.8vw, 25px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.stepTitle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.stepText {
+  margin: clamp(18px, 1.8vw, 24px) 0 0;
+  max-width: 32ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6b645b;
+  text-wrap: pretty;
+}
+
+@media (hover: hover) {
+  .stepItem:hover .stepItemBody {
+    transform: translateY(-3px);
+  }
+  .stepItem:hover .stepDot::after {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  .stepItem:hover .stepTitle::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 859px) {
   .stepsTrack {
     left: 5px;
     right: auto;
@@ -146,20 +221,23 @@
   }
   .stepsGrid {
     grid-template-columns: 1fr;
-    gap: clamp(30px, 9vw, 44px);
+    gap: clamp(36px, 8vw, 52px);
   }
   .stepItem {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: clamp(18px, 4vw, 28px);
   }
   .stepDot {
     margin-bottom: 0;
-    margin-top: 6px;
+    margin-top: 20px;
   }
   .stepItemBody {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  .stepNum {
+    font-size: clamp(44px, 11vw, 60px);
   }
 }
 
@@ -266,53 +344,144 @@
 
 .aboutGrid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(36px, 5vw, 64px);
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 56px);
   align-items: center;
   width: 100%;
+  padding-top: clamp(64px, 9vw, 120px);
+  padding-bottom: clamp(64px, 9vw, 120px);
 }
 
 @media (min-width: 900px) {
   .aboutGrid {
-    grid-template-columns: 1.15fr 0.85fr;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: clamp(56px, 7vw, 128px);
+    row-gap: clamp(32px, 5vh, 56px);
+    row-gap: clamp(32px, 5svh, 56px);
+    padding-top: clamp(36px, 5vh, 64px);
+    padding-top: clamp(36px, 5svh, 64px);
+    padding-bottom: clamp(36px, 5vh, 64px);
+    padding-bottom: clamp(36px, 5svh, 64px);
   }
 }
 
-.principlesGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: clamp(20px, 3vw, 28px);
-}
-
-.principleCard {
-  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.principleCard:hover {
-  transform: translateY(-3px);
-}
-
-.principleCard:hover .principleNum {
-  color: var(--accent);
-}
-
-.principleNum {
-  transition: color 0.4s ease;
+.aboutText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .aboutImageFrame {
   position: relative;
   overflow: hidden;
-  border-radius: 2px;
-  aspect-ratio: 16 / 11;
-  box-shadow: 0 30px 60px -30px rgba(38, 35, 31, 0.4);
+  aspect-ratio: 4 / 3;
 }
 
 @media (min-width: 900px) {
   .aboutImageFrame {
-    position: sticky;
-    top: 96px;
+    aspect-ratio: auto;
+    width: 100%;
+    height: clamp(340px, 50vh, 640px);
+    height: clamp(340px, 50svh, 640px);
+  }
+}
+
+.aboutPoints {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid #e9e2d9;
+  padding-top: clamp(36px, 4vw, 60px);
+}
+
+@media (min-width: 900px) {
+  .aboutPoints {
+    padding-top: clamp(24px, 4vh, 40px);
+    padding-top: clamp(24px, 4svh, 40px);
+  }
+}
+
+.aboutPoint {
+  height: 100%;
+  padding: 0 clamp(20px, 3vw, 56px);
+  border-left: 1px solid #e9e2d9;
+}
+
+.aboutPoints > :first-child .aboutPoint {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.aboutPointNum {
+  display: block;
+  font-weight: 500;
+  font-size: clamp(44px, 5vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  color: #e3dacd;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.5s ease;
+}
+
+.aboutPointTitle {
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 22px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #26231f;
+}
+
+.aboutPointRule {
+  width: 28px;
+  height: 2px;
+  margin-top: 14px;
+  background: var(--accent);
+}
+
+.aboutPointText {
+  margin: 16px 0 0;
+  max-width: 30ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6b645b;
+  text-wrap: pretty;
+}
+
+@media (min-width: 900px) {
+  .aboutPointNum {
+    font-size: clamp(44px, 4.3vw, 66px);
+  }
+  .aboutPointTitle {
+    margin-top: clamp(12px, 1.5vw, 20px);
+  }
+  .aboutPointText {
+    margin-top: 12px;
+  }
+}
+
+@media (hover: hover) {
+  .aboutPoint:hover .aboutPointNum {
+    color: var(--accent);
+  }
+}
+
+@media (max-width: 699px) {
+  .aboutPoints {
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 0;
+    padding-top: 0;
+  }
+  .aboutPoint {
+    padding: clamp(26px, 7vw, 36px) 0;
+    border-left: 0;
+    border-top: 1px solid #e9e2d9;
+  }
+  .aboutPoints > :first-child .aboutPoint {
+    padding-top: clamp(26px, 7vw, 36px);
+  }
+  .aboutPointNum {
+    font-size: clamp(44px, 12vw, 58px);
   }
 }
 
@@ -324,6 +493,12 @@
   overflow: hidden;
   padding-top: var(--header-h, 84px);
   gap: clamp(10px, 2vw, 18px);
+}
+
+@media (min-width: 900px) {
+  .storitveSection {
+    gap: clamp(20px, 2.8vw, 40px);
+  }
 }
 
 .storitveIntroWrap {
@@ -497,6 +672,8 @@
 }
 
 .servicePanel {
+  --panel-pad: clamp(22px, 5vw, 44px);
+  --panel-ease: cubic-bezier(0.22, 0.61, 0.24, 1);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -505,60 +682,291 @@
   background: #14110e;
   height: 100%;
   scroll-snap-align: start;
-  padding: clamp(20px, 5vw, 40px);
+  padding: var(--panel-pad);
+  isolation: isolate;
 }
 
 .servicePanelImg {
   position: absolute;
   inset: 0;
+  z-index: -1;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform: scale(1.001);
+  transition: transform 1.4s var(--panel-ease);
+  will-change: transform;
 }
 
-.servicePanel:hover .servicePanelImg {
-  transform: scale(1.03);
-}
-
+/* Base overlay: eased multi-stop falloff so every photo reads the same,
+   regardless of its own brightness. Top veil anchors the numeral. */
 .servicePanelOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(20, 17, 14, 0.35) 0%,
-    rgba(20, 17, 14, 0) 24%,
-    rgba(20, 17, 14, 0) 34%,
-    rgba(20, 17, 14, 0.88) 100%
-  );
+  z-index: -1;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20, 17, 14, 0.46) 0%,
+      rgba(20, 17, 14, 0.16) 12%,
+      rgba(20, 17, 14, 0) 24%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(20, 17, 14, 0) 30%,
+      rgba(20, 17, 14, 0.14) 42%,
+      rgba(20, 17, 14, 0.42) 56%,
+      rgba(20, 17, 14, 0.72) 72%,
+      rgba(20, 17, 14, 0.9) 100%
+    );
+  background-color: rgba(20, 17, 14, 0.06);
+  pointer-events: none;
+}
+
+/* Hover layer: a quiet deepening of the lower half, cross-faded in. */
+.servicePanelOverlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 17, 14, 0) 20%, rgba(20, 17, 14, 0.32) 100%);
+  opacity: 0;
+  transition: opacity 0.9s var(--panel-ease);
+}
+
+/* Numeral row: index + hairline + total, set like a running header. */
+.servicePanelHead {
+  position: absolute;
+  top: clamp(18px, 3vw, 34px);
+  left: var(--panel-pad);
+  right: var(--panel-pad);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.4vw, 18px);
   pointer-events: none;
 }
 
 .servicePanelNum {
-  position: absolute;
-  top: clamp(16px, 3vw, 32px);
-  left: clamp(20px, 5vw, 40px);
-  font-weight: 700;
-  font-size: clamp(38px, 6vw, 86px);
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: rgba(255, 255, 255, 0.32);
+  font-weight: 500;
+  font-size: clamp(34px, 4.4vw, 68px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.86);
 }
 
+.servicePanelRule {
+  flex: 1 1 auto;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.24);
+  transform-origin: left center;
+  transform: scaleX(0.92);
+  transition: transform 0.9s var(--panel-ease), background-color 0.6s ease;
+}
+
+.servicePanelTotal {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+}
+
+/* Body stays unpositioned so the CTA's hit area (::after) spans the whole panel. */
 .servicePanelBody {
-  position: relative;
-  z-index: 1;
+  max-width: 36ch;
+}
+
+.servicePanelAccent {
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin-bottom: clamp(16px, 1.6vw, 22px);
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 0.7s var(--panel-ease);
+}
+
+.servicePanelTitle {
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(28px, 2.9vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.servicePanelTagline {
+  margin: clamp(10px, 1vw, 14px) 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.64);
+}
+
+.servicePanelList {
+  list-style: none;
+  padding: clamp(16px, 1.6vw, 20px) 0 0;
+  margin: clamp(16px, 1.6vw, 20px) 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.servicePanelList li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.servicePanelDot {
+  flex-shrink: 0;
+  width: 4px;
+  height: 4px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--accent);
 }
 
 .servicePanelCta {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: clamp(14px, 3vw, 28px);
+  gap: 10px;
+  margin-top: clamp(18px, 2.4vw, 30px);
+  color: #fff;
 }
 
-.servicePanel:hover .ctaArrow {
-  transform: translateX(4px);
+.servicePanelCta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.servicePanelCta:focus-visible {
+  outline: none;
+}
+
+.servicePanelCta:focus-visible::after {
+  outline: 1px solid rgba(255, 255, 255, 0.7);
+  outline-offset: -10px;
+}
+
+.servicePanelCtaLabel {
+  position: relative;
+  padding-bottom: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Two stacked underlines: the resting one slides out to the right,
+   the accent one draws in from the left. */
+.servicePanelCtaLabel::before,
+.servicePanelCtaLabel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  transition: transform 0.6s var(--panel-ease);
+}
+
+.servicePanelCtaLabel::before {
+  background: rgba(255, 255, 255, 0.5);
+  transform-origin: right center;
+}
+
+.servicePanelCtaLabel::after {
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition-delay: 0.08s;
+}
+
+.servicePanelCta .ctaArrow {
+  transition-duration: 0.6s;
+  transition-timing-function: var(--panel-ease);
+}
+
+@media (hover: hover) {
+  .servicePanel:hover .servicePanelImg {
+    transform: scale(1.045);
+  }
+  .servicePanel:hover .servicePanelOverlay::after {
+    opacity: 1;
+  }
+  .servicePanel:hover .servicePanelRule {
+    transform: scaleX(1);
+    background-color: rgba(255, 255, 255, 0.4);
+  }
+  .servicePanel:hover .servicePanelAccent {
+    transform: scaleX(1.75);
+  }
+  .servicePanel:hover .servicePanelCtaLabel::before {
+    transform: scaleX(0);
+  }
+  .servicePanel:hover .servicePanelCtaLabel::after {
+    transform: scaleX(1);
+  }
+  .servicePanel:hover .ctaArrow {
+    transform: translateX(6px);
+  }
+}
+
+.servicePanel:has(:focus-visible) .servicePanelImg {
+  transform: scale(1.045);
+}
+.servicePanel:has(:focus-visible) .servicePanelOverlay::after {
+  opacity: 1;
+}
+.servicePanel:has(:focus-visible) .servicePanelAccent {
+  transform: scaleX(1.75);
+}
+.servicePanel:has(:focus-visible) .servicePanelCtaLabel::before {
+  transform: scaleX(0);
+}
+.servicePanel:has(:focus-visible) .servicePanelCtaLabel::after {
+  transform: scaleX(1);
+}
+.servicePanel:has(:focus-visible) .ctaArrow {
+  transform: translateX(6px);
+}
+
+@media (max-width: 899px) {
+  .servicePanelTitle {
+    font-size: clamp(26px, 7.4vw, 34px);
+  }
+  .servicePanelList li {
+    font-size: 13.5px;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 900px) {
+  .servicePanelList {
+    gap: 6px;
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+  .servicePanelCta {
+    margin-top: 16px;
+  }
 }
 
 .contactLine {
@@ -578,23 +986,192 @@
   color: var(--accent-light);
 }
 
-.field {
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+.contactGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(48px, 6vw, 112px);
+  align-items: start;
 }
 
-.field:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(232, 116, 36, 0.14);
+.contactFormCol {
+  position: relative;
+  padding-left: clamp(36px, 5.5vw, 96px);
+  border-left: 1px solid #e9e2d9;
+}
+
+.contactForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(24px, 3vw, 44px);
+  row-gap: clamp(26px, 2.6vw, 34px);
+  margin-top: clamp(32px, 3.6vw, 48px);
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldWrap {
+  position: relative;
+  display: block;
+}
+
+.fieldWrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  pointer-events: none;
+}
+
+.fieldWrap:focus-within::after {
+  transform: scaleX(1);
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a09889;
+  transition: color 0.3s ease;
+}
+
+.fieldWrap:focus-within .fieldLabel {
+  color: var(--accent);
+}
+
+.fieldInput {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #d9d1c6;
+  border-radius: 0;
+  padding: 12px 0 13px;
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 1.4;
+  color: #26231f;
   outline: none;
+  transition: border-color 0.3s ease;
 }
 
-.submitBtn {
-  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.3s ease;
+.fieldWrap:hover .fieldInput {
+  border-bottom-color: #bfb5a7;
 }
 
-.submitBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(232, 116, 36, 0.3);
+.fieldInput:user-invalid {
+  border-bottom-color: #b5483a;
+}
+
+.fieldTextarea {
+  resize: none;
+  min-height: 88px;
+}
+
+.formFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 28px;
+  margin-top: 6px;
+}
+
+.formSubmit {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 30px;
+  border: 0;
+  border-radius: 0;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.formSubmit:hover {
+  background: var(--accent-dark);
+}
+
+.formSubmit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.formSubmitArrow {
+  display: inline-block;
+  font-size: 16px;
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.formSubmit:hover .formSubmitArrow {
+  transform: translateX(5px);
+}
+
+.formNote {
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #8a8378;
+}
+
+.formNoteLink {
+  color: #5a544c;
+  text-decoration: underline;
+  text-decoration-color: rgba(232, 116, 36, 0.5);
+  text-underline-offset: 3px;
+  transition: color 0.3s ease, text-decoration-color 0.3s ease;
+}
+
+.formNoteLink:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+
+.formSuccess {
+  margin: 0;
+  padding-left: 16px;
+  border-left: 2px solid var(--accent);
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4a453f;
+  animation: pgUp 0.5s ease both;
+}
+
+@media (max-width: 899px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: 56px;
+  }
+  .contactFormCol {
+    padding-left: 0;
+    padding-top: clamp(36px, 8vw, 52px);
+    border-left: 0;
+    border-top: 1px solid #e9e2d9;
+  }
+}
+
+@media (max-width: 560px) {
+  .contactForm {
+    grid-template-columns: 1fr;
+  }
+  .formSubmit {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .mobileMenuOverlay {

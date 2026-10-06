@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Politika zasebnosti — PG INŽENIRING d.o.o.",
+  title: "Politika zasebnosti | PG INŽENIRING d.o.o.",
   description: "Politika zasebnosti in uporabe piškotkov na spletni strani PG INŽENIRING d.o.o.",
 };
 
@@ -57,7 +57,7 @@ export default function PolitikaZasebnostiPage() {
             <br />
             <strong>PG INŽENIRING d.o.o.</strong>
             <br />
-            Kuzma 24, 9263 Kuzma, Slovenija
+            Gornji Slaveči 97, 9263 Kuzma, Slovenija
             <br />
             Matična številka: 2366380000
             <br />
@@ -76,7 +76,7 @@ export default function PolitikaZasebnostiPage() {
           </p>
           <p>
             Pravna podlaga za obdelavo je vaša privolitev, izražena z oddajo obrazca, oziroma izvajanje ukrepov na
-            vašo zahtevo pred sklenitvijo pogodbe (člen 6(1)(a) in (b) Splošne uredbe o varstvu podatkov – GDPR).
+            vašo zahtevo pred sklenitvijo pogodbe (člen 6(1)(a) in (b) Splošne uredbe o varstvu podatkov, GDPR).
           </p>
         </Section>
 
