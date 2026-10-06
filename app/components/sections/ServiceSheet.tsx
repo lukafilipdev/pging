@@ -1,35 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Image from "next/image";
-import { services } from "../lib/data";
+import { services } from "../../lib/content";
+import { useBodyScrollLock } from "../../lib/hooks";
+import { indexLabel } from "../../lib/utils";
+import { ArrowIcon } from "../ui/ArrowIcon";
 import styles from "./ServiceSheet.module.css";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
-function Arrow({ flip = false }: { flip?: boolean }) {
-  return (
-    <svg width="15" height="11" viewBox="0 0 16 12" fill="none" style={flip ? { transform: "scaleX(-1)" } : undefined}>
-      <path d="M1 6H15M15 6L10 1M15 6L10 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-export default function ServiceSheet({
-  index,
-  onClose,
-  onNavigate,
-}: {
+type ServiceSheetProps = {
+  /** Service to show, or null when closed. */
   index: number | null;
   onClose: () => void;
   onNavigate: (i: number) => void;
-}) {
+};
+
+/** Side sheet (full screen on phones) with a service's full description. */
+export function ServiceSheet({ index, onClose, onNavigate }: ServiceSheetProps) {
   const open = index !== null;
   const closeRef = useRef<HTMLButtonElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
+  useBodyScrollLock(open);
 
-  // Keep the last shown service while the sheet animates out, and bump a key
+  // Keep the last service visible while the sheet animates out, and bump a key
   // on every open so the entry animation replays.
   const [shown, setShown] = useState(0);
   const [openCount, setOpenCount] = useState(0);
@@ -42,19 +35,16 @@ export default function ServiceSheet({
     }
   }
 
+  // Focus the close button while open, Escape closes, focus returns to the opener.
   useEffect(() => {
     if (!open) return;
-    openerRef.current = document.activeElement as HTMLElement | null;
-    document.body.style.overflow = "hidden";
+    const opener = document.activeElement as HTMLElement | null;
     closeRef.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-      openerRef.current?.focus({ preventScroll: true });
+      opener?.focus({ preventScroll: true });
     };
   }, [open, onClose]);
 
@@ -62,30 +52,26 @@ export default function ServiceSheet({
     scrollRef.current?.scrollTo({ top: 0 });
   }, [shown]);
 
-  const s = services[shown];
+  const service = services[shown];
   const prev = (shown - 1 + services.length) % services.length;
   const next = (shown + 1) % services.length;
 
-  function goToContact(e: React.MouseEvent<HTMLAnchorElement>) {
+  const goToContact = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     onClose();
-    requestAnimationFrame(() => {
-      document.getElementById("kontakt")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-  }
+    requestAnimationFrame(() => document.getElementById("kontakt")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+  };
 
   return (
     <div className={styles.root} data-open={open} inert={!open} aria-hidden={!open}>
       <div className={styles.backdrop} onClick={onClose} />
-      <div
-        className={styles.sheet}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="service-sheet-title"
-      >
+      <div className={styles.sheet} role="dialog" aria-modal="true" aria-labelledby="service-sheet-title">
         <div className={styles.bar}>
           <span className={`font-barlow-condensed ${styles.barLabel}`}>
-            Storitve <span className={styles.barCount}>{pad(shown + 1)} / {pad(services.length)}</span>
+            Storitve{" "}
+            <span className={styles.barCount}>
+              {indexLabel(shown)} / {indexLabel(services.length - 1)}
+            </span>
           </span>
           <button ref={closeRef} type="button" className={styles.close} onClick={onClose}>
             <span className="font-barlow-condensed">Zapri</span>
@@ -96,12 +82,12 @@ export default function ServiceSheet({
         <div ref={scrollRef} className={styles.scroll}>
           <div key={`${openCount}-${shown}`} className={styles.content}>
             <div className={styles.media}>
-              <Image src={s.image} alt={s.alt} fill sizes="(min-width: 760px) 760px, 100vw" className={styles.mediaImg} />
+              <Image src={service.image} alt={service.alt} fill sizes="(min-width: 760px) 760px, 100vw" className={styles.mediaImg} />
               <div className={styles.mediaShade} aria-hidden />
               <div className={styles.mediaCaption}>
-                <span className={`font-archivo ${styles.num}`}>{s.num}</span>
+                <span className={`font-archivo ${styles.num}`}>{indexLabel(shown)}</span>
                 <h2 id="service-sheet-title" className={`font-archivo ${styles.title}`}>
-                  {s.title}
+                  {service.title}
                 </h2>
               </div>
             </div>
@@ -109,22 +95,22 @@ export default function ServiceSheet({
             <div className={styles.body}>
               <p className={`font-barlow-condensed ${styles.tagline}`}>
                 <span className={styles.accent} aria-hidden />
-                {s.tagline}
+                {service.tagline}
               </p>
-              <p className={`font-archivo ${styles.lead}`}>{s.lead}</p>
-              {s.body.map((para) => (
-                <p key={para} className={styles.text}>
-                  {para}
+              <p className={`font-archivo ${styles.lead}`}>{service.lead}</p>
+              {service.body.map((paragraph) => (
+                <p key={paragraph} className={styles.text}>
+                  {paragraph}
                 </p>
               ))}
 
               <div className={styles.scope}>
                 <span className={`font-barlow-condensed ${styles.scopeLabel}`}>Obseg storitve</span>
                 <ul className={styles.scopeList}>
-                  {s.items.map((it, i) => (
-                    <li key={it}>
-                      <span className={`font-archivo ${styles.scopeNum}`}>{pad(i + 1)}</span>
-                      <span>{it}</span>
+                  {service.items.map((item, i) => (
+                    <li key={item}>
+                      <span className={`font-archivo ${styles.scopeNum}`}>{indexLabel(i)}</span>
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -133,7 +119,7 @@ export default function ServiceSheet({
               <a href="#kontakt" className={styles.cta} onClick={goToContact}>
                 <span className="font-barlow-condensed">Pošljite povpraševanje</span>
                 <span className={styles.ctaArrow} aria-hidden>
-                  <Arrow />
+                  <ArrowIcon />
                 </span>
               </a>
             </div>
@@ -141,16 +127,16 @@ export default function ServiceSheet({
             <nav className={styles.pager} aria-label="Druge storitve">
               <button type="button" className={styles.pagerBtn} onClick={() => onNavigate(prev)}>
                 <span className={styles.pagerArrow} aria-hidden>
-                  <Arrow flip />
+                  <ArrowIcon direction="left" />
                 </span>
-                <span className={`font-archivo ${styles.pagerNum}`}>{services[prev].num}</span>
+                <span className={`font-archivo ${styles.pagerNum}`}>{indexLabel(prev)}</span>
                 <span className={`font-archivo ${styles.pagerTitle}`}>{services[prev].title}</span>
               </button>
               <button type="button" className={`${styles.pagerBtn} ${styles.pagerNext}`} onClick={() => onNavigate(next)}>
-                <span className={`font-archivo ${styles.pagerNum}`}>{services[next].num}</span>
+                <span className={`font-archivo ${styles.pagerNum}`}>{indexLabel(next)}</span>
                 <span className={`font-archivo ${styles.pagerTitle}`}>{services[next].title}</span>
                 <span className={styles.pagerArrow} aria-hidden>
-                  <Arrow />
+                  <ArrowIcon />
                 </span>
               </button>
             </nav>

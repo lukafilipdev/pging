@@ -1,171 +1,68 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 
-export function useReveal<T extends HTMLElement = HTMLDivElement>(delay = 0) {
-  const ref = useRef<T>(null);
-  const [shown, setShown] = useState(false);
-  const [settled, setSettled] = useState(false);
+/** True once the page has scrolled past the hero (#top). */
+export function useScrolledPastHero() {
+  const [past, setPast] = useState(false);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (!("IntersectionObserver" in window)) {
-      const t = setTimeout(() => setShown(true), 0);
-      return () => clearTimeout(t);
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setShown(true);
-            io.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
-    );
-    io.observe(el);
-    const fallback = setTimeout(() => setShown(true), 3000);
+    const hero = document.getElementById("top");
+    if (!hero) return;
+    const update = () => setPast(window.scrollY > hero.offsetHeight - 90);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
     return () => {
-      io.disconnect();
-      clearTimeout(fallback);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
     };
   }, []);
 
-  useEffect(() => {
-    if (!shown) return;
-    const t = setTimeout(() => setSettled(true), 900 + delay + 100);
-    return () => clearTimeout(t);
-  }, [shown, delay]);
-
-  const style: CSSProperties = settled
-    ? { opacity: 1, transform: "none", clipPath: "none" }
-    : {
-        opacity: shown ? 1 : 0,
-        transform: shown ? "none" : "translateY(var(--reveal-shift))",
-        clipPath: shown ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)",
-        transition: [
-          `opacity var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
-          `transform var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
-          `clip-path var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
-        ].join(", "),
-      };
-
-  return { ref, style };
+  return past;
 }
 
-export function useViewportHeightVar(ref: RefObject<HTMLElement | null>) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const vv = window.visualViewport;
-    const setHeight = () => {
-      const h = vv?.height ?? window.innerHeight;
-      el.style.minHeight = `${h}px`;
-    };
-    setHeight();
-    window.addEventListener("resize", setHeight);
-    window.addEventListener("orientationchange", setHeight);
-    vv?.addEventListener("resize", setHeight);
-    return () => {
-      window.removeEventListener("resize", setHeight);
-      window.removeEventListener("orientationchange", setHeight);
-      vv?.removeEventListener("resize", setHeight);
-    };
-  }, [ref]);
-}
-
-export function useCssVarFromHeight(ref: RefObject<HTMLElement | null>, varName: string) {
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const setVar = () => {
-      document.documentElement.style.setProperty(varName, `${el.offsetHeight}px`);
-    };
-    setVar();
-    const ro = new ResizeObserver(setVar);
-    ro.observe(el);
-    window.addEventListener("resize", setVar);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", setVar);
-    };
-  }, [ref, varName]);
-}
-
-export function useHeaderSolid(heroRef: RefObject<HTMLElement | null>) {
-  const [solid, setSolid] = useState(false);
-
-  useEffect(() => {
-    const hero = heroRef.current;
-    if (!hero) return;
-    const onScroll = () => {
-      const y = window.scrollY || 0;
-      setSolid(y > hero.offsetHeight - 90);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [heroRef]);
-
-  return solid;
-}
-
-export function useActiveSection(ids: string[]) {
+/** Id of the section currently crossing the middle of the viewport. */
+export function useActiveSection(ids: readonly string[]) {
   const [active, setActive] = useState(ids[0] ?? "");
+  const key = ids.join(",");
 
   useEffect(() => {
-    const els = ids
+    const els = key
+      .split(",")
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null);
-    if (!els.length || !("IntersectionObserver" in window)) return;
-
     const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+      (entries) => entries.forEach((entry) => entry.isIntersecting && setActive(entry.target.id)),
+      { rootMargin: "-45% 0px -45% 0px" }
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ids.join(",")]);
+  }, [key]);
 
   return active;
 }
 
-export function useParallaxDrift(imgRef: RefObject<HTMLImageElement | null>, strength = 60) {
+/** Prevents the page behind an overlay from scrolling while `locked`. */
+export function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
-    const img = imgRef.current;
-    const sec = img?.parentElement;
-    if (!img || !sec) return;
-    let raf = 0;
-    const apply = () => {
-      const r = sec.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
-      const p = (window.innerHeight - r.top) / (window.innerHeight + r.height);
-      img.style.translate = "0 " + ((p - 0.5) * strength).toFixed(1) + "px";
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(apply);
-    };
-    apply();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    if (!locked) return;
+    document.body.style.overflow = "hidden";
     return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
+      document.body.style.overflow = "";
     };
-  }, [imgRef, strength]);
+  }, [locked]);
 }
 
-export function useQuoteParallax(imgRef: RefObject<HTMLImageElement | null>) {
-  useParallaxDrift(imgRef, 60);
+/** Mirrors an element's height into a CSS custom property on <html>. */
+export function useHeightVar(ref: RefObject<HTMLElement | null>, varName: string) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const sync = () => document.documentElement.style.setProperty(varName, `${el.offsetHeight}px`);
+    sync(); // ResizeObserver's first callback waits for a rendering frame.
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ref, varName]);
 }

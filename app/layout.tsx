@@ -1,24 +1,25 @@
 import type { Metadata } from "next";
 import { Archivo, Barlow, Barlow_Condensed, Bebas_Neue } from "next/font/google";
+import { CookieBanner } from "./components/layout/CookieBanner";
 import "./globals.css";
-import CookieBanner from "./components/CookieBanner";
 
+// Only the weights the design renders; each one is a separate preloaded file.
 const archivo = Archivo({
   variable: "--font-archivo",
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["500", "600", "700"],
 });
 
 const bebasNeue = Bebas_Neue({
   variable: "--font-display",
   subsets: ["latin", "latin-ext"],
-  weight: ["400"],
+  weight: "400",
 });
 
 const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
 });
 
 const barlowCondensed = Barlow_Condensed({
@@ -35,11 +36,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="sl"
-      className={`${archivo.variable} ${barlow.variable} ${barlowCondensed.variable} ${bebasNeue.variable}`}
-    >
+    <html lang="sl" className={`${archivo.variable} ${barlow.variable} ${barlowCondensed.variable} ${bebasNeue.variable}`}>
       <body>
+        {/* Without JavaScript nothing would trigger the scroll reveals, so show everything. */}
+        <noscript>
+          <style>{"[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}"}</style>
+        </noscript>
         {children}
         <CookieBanner />
       </body>

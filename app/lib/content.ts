@@ -1,3 +1,23 @@
+// Site copy and contact details. Numbering ("01", "02"…) and reveal delays are
+// derived from list order, so reordering or adding items needs no other edits.
+
+export const company = {
+  name: "PG INŽENIRING d.o.o.",
+  street: "Gornji Slaveči 97, 9263 Kuzma",
+  region: "Prekmurje, Slovenija",
+  phone: "070 799 810",
+  phoneHref: "tel:070799810",
+  email: "info@pg-inzeniring.si",
+  emailHref: "mailto:info@pg-inzeniring.si",
+};
+
+export const navItems = [
+  { id: "top", label: "Domov" },
+  { id: "o-podjetju", label: "O podjetju" },
+  { id: "storitve", label: "Storitve" },
+  { id: "kontakt", label: "Kontakt" },
+];
+
 export const heroMarks = [
   { title: "Projektiranje", text: "Visoke in nizke gradnje" },
   { title: "Gradnja", text: "Novogradnje in obnove" },
@@ -6,20 +26,14 @@ export const heroMarks = [
 
 export const principles = [
   {
-    num: "01",
-    delay: 0,
     title: "Osebni pristop",
     text: "Ena kontaktna oseba od prvega pogovora do predaje, brez vmesnih posrednikov.",
   },
   {
-    num: "02",
-    delay: 110,
     title: "Jasen postopek",
     text: "Vsak korak projekta je pregleden, o poteku in dogovorjenih rokih pa vas sproti obveščamo.",
   },
   {
-    num: "03",
-    delay: 220,
     title: "Doma v Prekmurju",
     text: "Poznamo lokalne razmere in upravne postopke, delujemo pa tudi po vsej Sloveniji.",
   },
@@ -27,8 +41,6 @@ export const principles = [
 
 export const services = [
   {
-    num: "01",
-    delay: 0,
     title: "Projektiranje",
     tagline: "Dobre ideje ustvarijo trajno vrednost.",
     lead: "Projektiramo vse vrste objektov, od stanovanjskih hiš do zahtevnih visokih in nizkih gradenj.",
@@ -41,8 +53,6 @@ export const services = [
     alt: "Delovna miza z arhitekturnimi načrti in skicami",
   },
   {
-    num: "02",
-    delay: 110,
     title: "Gradnja",
     tagline: "Od načrta do realnosti.",
     lead: "Pri novogradnji, rekonstrukciji, obnovi ali adaptaciji vas razbremenimo skrbi, povezanih z izvedbo.",
@@ -55,8 +65,6 @@ export const services = [
     alt: "Sodobna hiša v fazi gradnje ob sončnem zahodu",
   },
   {
-    num: "03",
-    delay: 220,
     title: "Nadzor",
     tagline: "Kakovost v vsakem koraku.",
     lead: "S strokovnim nadzorom nad gradnjo poskrbimo, da vaša investicija doseže želeno kakovost.",
@@ -70,28 +78,22 @@ export const services = [
   },
 ];
 
+export type Service = (typeof services)[number];
+
 export const steps = [
   {
-    num: "01",
-    delay: 0,
     title: "Posvet",
     text: "Povejte, kaj načrtujete. Pridemo na teren, pogledamo parcelo in se pogovorimo brez obveznosti.",
   },
   {
-    num: "02",
-    delay: 110,
     title: "Načrt",
     text: "Pripravimo idejno zasnovo in dokumentacijo, ki upošteva vaše želje, proračun in predpise.",
   },
   {
-    num: "03",
-    delay: 220,
     title: "Gradnja",
     text: "Organiziramo izvedbo, uskladimo izvajalce in vas razbremenimo vsakodnevnih skrbi.",
   },
   {
-    num: "04",
-    delay: 330,
     title: "Predaja",
     text: "Nadzorujemo kvaliteto do konca in objekt predamo takšen, kot je bil dogovorjen.",
   },

@@ -1,0 +1,217 @@
+.process {
+  background: #fff;
+}
+
+.inner {
+  padding-top: clamp(72px, 10vw, 140px);
+  padding-bottom: clamp(72px, 10vw, 140px);
+}
+
+.title {
+  margin: 20px 0 0;
+  font-weight: 700;
+  font-size: clamp(32px, 4.4vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+
+.timeline {
+  position: relative;
+  margin-top: clamp(44px, 6vw, 72px);
+}
+
+/* Rail and its scroll-driven fill (horizontal on desktop) */
+.rail,
+.railFill {
+  position: absolute;
+  left: 0;
+  top: 5px;
+  height: 1px;
+}
+
+.rail {
+  right: 0;
+  background: #efe9e2;
+}
+
+.railFill {
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(28px, 3.4vw, 52px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+}
+
+.dot {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
+  margin-bottom: clamp(26px, 3vw, 40px);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px #fff, 0 0 0 3px rgba(232, 116, 36, 0.18);
+}
+
+/* Hover halo */
+.dot::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.55);
+  pointer-events: none;
+  transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.stepBody {
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.stepNum {
+  display: block;
+  font-weight: 600;
+  font-size: clamp(46px, 4.8vw, 72px);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: #f0a46b;
+}
+
+.stepTitle {
+  position: relative;
+  display: inline-block;
+  margin: clamp(14px, 1.6vw, 22px) 0 0;
+  font-weight: 700;
+  font-size: clamp(20px, 1.8vw, 25px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Hover underline */
+.stepTitle::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.stepText {
+  margin: clamp(18px, 1.8vw, 24px) 0 0;
+  max-width: 32ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6b645b;
+  text-wrap: pretty;
+}
+
+@media (hover: hover) {
+  .step:hover .stepBody {
+    transform: translateY(-3px);
+  }
+  .step:hover .dot::after {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  .step:hover .stepTitle::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Below 860px: a vertical timeline, number and title sharing a baseline. */
+@media (max-width: 859px) {
+  .inner {
+    padding-top: clamp(60px, 17vw, 72px);
+    padding-bottom: clamp(60px, 17vw, 72px);
+  }
+
+  .timeline {
+    margin-top: 32px;
+  }
+
+  /* 2px rail from the first dot down. */
+  .rail {
+    left: 4.5px;
+    right: auto;
+    top: 19px;
+    bottom: 0;
+    width: 2px;
+    height: auto;
+    background: #ece5dc;
+  }
+
+  .railFill {
+    left: 4.5px;
+    top: 19px;
+    width: 2px;
+    height: calc(100% - 19px);
+    transform: scaleY(1);
+    transform-origin: center top;
+  }
+
+  .steps {
+    grid-template-columns: 1fr;
+    gap: clamp(30px, 9vw, 40px);
+  }
+
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(18px, 5vw, 26px);
+  }
+
+  .dot {
+    margin-top: 14px;
+    margin-bottom: 0;
+  }
+
+  .stepBody {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    flex: 1 1 auto;
+    column-gap: 14px;
+    min-width: 0;
+  }
+
+  .stepNum {
+    font-size: clamp(44px, 13vw, 54px);
+    line-height: 0.84;
+  }
+
+  .stepTitle {
+    justify-self: start;
+    margin: 0;
+    font-size: clamp(20px, 5.8vw, 23px);
+  }
+
+  .stepText {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    max-width: 42ch;
+    line-height: 1.55;
+  }
+}

@@ -1,0 +1,170 @@
+.footer {
+  overflow: hidden;
+  background: #14110e;
+  color: #e7e2db;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: clamp(30px, 4vw, 60px);
+  align-items: start;
+  padding-top: clamp(56px, 7vw, 96px);
+  padding-bottom: clamp(32px, 4vw, 48px);
+}
+
+.brandName {
+  font-weight: 700;
+  font-size: clamp(20px, 1.8vw, 24px);
+  letter-spacing: -0.018em;
+  color: #fff;
+}
+
+.brandAddress {
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #9a938a;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6f685f;
+}
+
+.item {
+  font-size: 15px;
+  color: #e7e2db;
+  transition: color 0.3s ease;
+}
+
+.itemBreak {
+  word-break: break-word;
+}
+
+/* Oversized background wordmark */
+.wordmark {
+  font-weight: 700;
+  font-size: clamp(40px, 11.6vw, 190px);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.055);
+  user-select: none;
+}
+
+/* Bottom bar */
+.barWrap {
+  margin-top: clamp(22px, 3vw, 34px);
+  border-top: 1px solid #2b2620;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  font-size: 13px;
+  color: #7d766d;
+}
+
+.barLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.barLink {
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: #7d766d;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.item:hover,
+.item:active,
+.barLink:hover,
+.barLink:active {
+  color: var(--accent-light);
+}
+
+/* Touch widths: same look, taller hit areas (padding replaces the gap). */
+@media (max-width: 899px) {
+  .col {
+    gap: 2px;
+  }
+
+  .label {
+    margin-bottom: 6px;
+  }
+
+  .item {
+    align-self: flex-start;
+    padding: 9px 0;
+  }
+
+  .barLink {
+    padding: 11px 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 36px 20px;
+    padding-top: 56px;
+    padding-bottom: 36px;
+  }
+
+  .brand {
+    grid-column: 1 / -1;
+  }
+
+  .label {
+    font-size: 12.5px;
+    color: #857d72;
+  }
+
+  .item {
+    font-size: 16px;
+  }
+
+  /* The wordmark is ~7.13em wide: size it to the content column so it spans
+     edge to edge without clipping. */
+  .wordmark {
+    font-size: calc((100vw - 2 * var(--page-gutter)) / 7.2);
+    color: rgba(255, 255, 255, 0.07);
+  }
+
+  .bar {
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 22px;
+    padding-bottom: max(26px, env(safe-area-inset-bottom));
+    color: #8f877c;
+  }
+
+  .barLinks {
+    order: 1;
+    gap: 0 22px;
+  }
+
+  .barLink {
+    font-size: 14px;
+    color: #a39b90;
+  }
+}

@@ -1,0 +1,110 @@
+.quote {
+  position: relative;
+  overflow: hidden;
+  background: #14110e;
+}
+
+.image {
+  object-fit: cover;
+  object-position: 55% 30%;
+  opacity: 0.9;
+  transform: scale(1.08);
+  will-change: transform;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14, 11, 8, 0.34) 0%, rgba(14, 11, 8, 0) 22%, rgba(14, 11, 8, 0) 70%, rgba(14, 11, 8, 0.42) 100%),
+    linear-gradient(100deg, rgba(14, 11, 8, 0.86) 0%, rgba(14, 11, 8, 0.7) 34%, rgba(14, 11, 8, 0.36) 64%, rgba(14, 11, 8, 0.12) 100%);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  padding-top: clamp(80px, 11vw, 150px);
+  padding-bottom: clamp(80px, 11vw, 150px);
+}
+
+.body {
+  max-width: 900px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.labelRule {
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.labelText {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.text {
+  margin: clamp(22px, 3vw, 34px) 0 0;
+  font-weight: 600;
+  font-size: clamp(26px, 4vw, 52px);
+  line-height: 1.16;
+  letter-spacing: -0.028em;
+  color: #fff;
+  text-wrap: pretty;
+}
+
+.textAccent {
+  color: var(--accent-light);
+}
+
+.sign {
+  margin-top: clamp(24px, 3vw, 36px);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+@media (max-width: 699px) {
+  /* Text spans the full width on phones, so the left-weighted wash becomes an
+     even veil with a deeper base; the photo still reads through. */
+  .shade {
+    background: linear-gradient(
+      180deg,
+      rgba(14, 11, 8, 0.5) 0%,
+      rgba(14, 11, 8, 0.34) 40%,
+      rgba(14, 11, 8, 0.5) 72%,
+      rgba(14, 11, 8, 0.72) 100%
+    );
+  }
+
+  .inner {
+    padding-top: clamp(64px, 18vw, 80px);
+    padding-bottom: clamp(64px, 18vw, 80px);
+  }
+
+  .labelText {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .text {
+    margin-top: 20px;
+    font-size: clamp(25px, 7.4vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.024em;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  .sign {
+    margin-top: 24px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}

@@ -1,0 +1,291 @@
+.about {
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 5vw, 56px);
+  align-items: center;
+  width: 100%;
+  padding-top: clamp(64px, 9vw, 120px);
+  padding-bottom: clamp(64px, 9vw, 120px);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  margin: 18px 0 0;
+  font-weight: 700;
+  font-size: clamp(30px, 3.9vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.titleAccent {
+  color: var(--accent);
+}
+
+.titleRule {
+  width: 56px;
+  height: 2px;
+  margin-top: 22px;
+  background: var(--accent);
+}
+
+.lead {
+  margin: 30px 0 0;
+  max-width: 50ch;
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.75;
+  color: #5a544c;
+  text-wrap: pretty;
+}
+
+/* Image */
+.image {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+/* Oversized vertically so the desktop zoom/parallax never exposes an edge. */
+.imageImg {
+  position: absolute;
+  inset: -6% 0;
+  width: 100%;
+  height: 112%;
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+
+.imageShade,
+.imageVignette {
+  position: absolute;
+  inset: 0;
+}
+
+.imageShade {
+  background: linear-gradient(180deg, rgba(20, 17, 14, 0) 55%, rgba(20, 17, 14, 0.6) 100%);
+}
+
+.imageVignette {
+  opacity: 0;
+  background: radial-gradient(120% 120% at 50% 50%, rgba(0, 0, 0, 0) 45%, rgba(10, 8, 6, 0.75) 100%);
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.captionRule {
+  flex-shrink: 0;
+  width: 22px;
+  height: 2px;
+  background: var(--accent-light);
+}
+
+.captionText {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/* Principles */
+.points {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: clamp(36px, 4vw, 60px);
+  border-top: 1px solid #e9e2d9;
+}
+
+.point {
+  height: 100%;
+  padding: 0 clamp(20px, 3vw, 56px);
+  border-left: 1px solid #e9e2d9;
+}
+
+.points > :first-child .point {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.pointNum {
+  display: block;
+  font-weight: 500;
+  font-size: clamp(44px, 5vw, 76px);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+  color: #e3dacd;
+  transition: color 0.5s ease;
+}
+
+.pointTitle {
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  font-weight: 700;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #26231f;
+}
+
+.pointRule {
+  width: 28px;
+  height: 2px;
+  margin-top: 14px;
+  background: var(--accent);
+}
+
+.pointText {
+  margin: 16px 0 0;
+  max-width: 30ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #6b645b;
+  text-wrap: pretty;
+}
+
+@media (hover: hover) {
+  .point:hover .pointNum {
+    color: var(--accent);
+  }
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    column-gap: clamp(56px, 7vw, 128px);
+    row-gap: clamp(32px, 5vh, 56px);
+    row-gap: clamp(32px, 5svh, 56px);
+    padding-top: clamp(36px, 5vh, 64px);
+    padding-top: clamp(36px, 5svh, 64px);
+    padding-bottom: clamp(36px, 5vh, 64px);
+    padding-bottom: clamp(36px, 5svh, 64px);
+  }
+
+  .image {
+    aspect-ratio: auto;
+    width: 100%;
+    height: clamp(340px, 50vh, 640px);
+    height: clamp(340px, 50svh, 640px);
+  }
+
+  .points {
+    padding-top: clamp(24px, 4vh, 40px);
+    padding-top: clamp(24px, 4svh, 40px);
+  }
+
+  .pointNum {
+    font-size: clamp(44px, 4.3vw, 66px);
+  }
+
+  .pointTitle {
+    margin-top: clamp(12px, 1.5vw, 20px);
+  }
+
+  .pointText {
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 899px) {
+  .caption {
+    left: var(--page-gutter);
+    right: var(--page-gutter);
+    bottom: 18px;
+  }
+
+  .captionText {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 699px) {
+  .grid {
+    gap: 32px;
+    padding-top: clamp(56px, 15vw, 64px);
+    padding-bottom: clamp(40px, 11vw, 52px);
+  }
+
+  .lead {
+    margin-top: 22px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #554f47;
+  }
+
+  /* Full-bleed image. Set on the Reveal wrapper so the clip animation includes the bleed. */
+  .imageReveal {
+    margin-inline: calc(var(--page-gutter) * -1);
+  }
+
+  .image {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* Principles become an editorial index: number left, text beside it. */
+  .points {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .point {
+    display: grid;
+    grid-template-columns: clamp(52px, 15vw, 64px) minmax(0, 1fr);
+    column-gap: clamp(12px, 4vw, 20px);
+    align-items: start;
+    padding: 24px 0;
+    border-left: 0;
+    border-top: 1px solid #e9e2d9;
+  }
+
+  .points > :first-child .point {
+    padding-top: 24px;
+  }
+
+  .points > :last-child .point {
+    padding-bottom: 0;
+  }
+
+  .pointNum {
+    grid-row: 1 / span 3;
+    font-size: clamp(36px, 11vw, 44px);
+    line-height: 0.86;
+    color: #d9cdbc;
+  }
+
+  .pointTitle {
+    margin: 2px 0 0;
+    font-size: 19px;
+    line-height: 1.2;
+  }
+
+  .pointRule {
+    width: 24px;
+    margin-top: 12px;
+  }
+
+  .pointText {
+    margin-top: 12px;
+    max-width: 42ch;
+    line-height: 1.6;
+  }
+}

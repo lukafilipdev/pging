@@ -1,0 +1,56 @@
+.banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px clamp(20px, 4vw, 40px);
+  background: #14110e;
+  border-top: 1px solid #2b2620;
+  color: #e7e2db;
+}
+
+.text {
+  margin: 0;
+  max-width: 640px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #c9c2b8;
+}
+
+.link {
+  color: #f2903f;
+}
+
+.actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.button {
+  padding: 11px 18px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.reject {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #e7e2db;
+}
+
+.accept {
+  background: var(--accent);
+  border: 0;
+  color: #fff;
+}

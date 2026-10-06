@@ -1,0 +1,19 @@
+.eyebrow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.index {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: #cfc7bd;
+}
+
+.label {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #a09889;
+}

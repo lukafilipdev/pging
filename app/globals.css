@@ -3,11 +3,12 @@
   --accent-light: #f2903f;
   --accent-dark: #c75c12;
 
-  /* Horizontal page gutter. Desktop value is unchanged; phones get a tighter,
-     width-aware gutter (18px at 320 → 24px at 430+). */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Horizontal page gutter: phones get a tighter, width-aware value. */
   --page-gutter: clamp(24px, 5vw, 110px);
 
-  /* Scroll-reveal motion; softened on phones. */
+  /* Scroll reveal motion; softened on phones. */
   --reveal-shift: 24px;
   --reveal-dur: 0.9s;
 }
@@ -78,6 +79,43 @@ button {
   font-family: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
 }
 
+.page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 2100px;
+  margin: 0 auto;
+  padding-left: var(--page-gutter);
+  padding-right: var(--page-gutter);
+}
+
+/* Scroll reveal — states are set by <ScrollEffects>. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--reveal-shift));
+  clip-path: inset(0 0 100% 0);
+  transition:
+    opacity var(--reveal-dur) var(--ease-out-expo) var(--reveal-delay, 0ms),
+    transform var(--reveal-dur) var(--ease-out-expo) var(--reveal-delay, 0ms),
+    clip-path var(--reveal-dur) var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 0% 0);
+}
+
+/* Once settled, drop the clip so hover zooms and bleeds aren't cut off. */
+[data-reveal="settled"] {
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+  transition: none;
+}
+
 @keyframes pgUp {
   from {
     opacity: 0;
@@ -86,24 +124,6 @@ button {
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes pgIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes pgLine {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
   }
 }
 

@@ -1,247 +1,177 @@
-"use client";
+import type gsapType from "gsap";
+import type { ScrollTrigger as ScrollTriggerType } from "gsap/ScrollTrigger";
 
-import { useEffect, type RefObject } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+type Gsap = typeof gsapType;
 
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+const fx = <T extends Element = HTMLElement>(name: string) => document.querySelector<T>(`[data-fx="${name}"]`);
+const fxAll = <T extends Element = HTMLElement>(name: string) => [...document.querySelectorAll<T>(`[data-fx="${name}"]`)];
 
-export interface ScrollFxRefs {
-  topBar: RefObject<HTMLDivElement | null>;
-  heroSection: RefObject<HTMLElement | null>;
-  heroBgWrap: RefObject<HTMLDivElement | null>;
-  heroContent: RefObject<HTMLDivElement | null>;
-  aboutSection: RefObject<HTMLElement | null>;
-  aboutImg: RefObject<HTMLImageElement | null>;
-  aboutVignette: RefObject<HTMLDivElement | null>;
-  principleDividers: RefObject<(HTMLDivElement | null)[]>;
-  quoteSection: RefObject<HTMLElement | null>;
-  quoteHeading: RefObject<HTMLDivElement | null>;
-  stepsContainer: RefObject<HTMLDivElement | null>;
-  stepsBar: RefObject<HTMLDivElement | null>;
-  stepDots: RefObject<(HTMLSpanElement | null)[]>;
-  stepNums: RefObject<(HTMLSpanElement | null)[]>;
-  contactCard: RefObject<HTMLDivElement | null>;
-  contactGlow: RefObject<HTMLDivElement | null>;
-  contactSection: RefObject<HTMLElement | null>;
-}
+const STEP_IDLE = "#e6ded3";
+const STEP_ACTIVE = "#e87424";
+const STEP_NUM_IDLE = "#e9e2d8";
+const STEP_NUM_ACTIVE = "#f0a46b";
+const ringShadow = (spread: number) => `0 0 0 5px #fff, 0 0 0 ${spread}px rgba(232,116,36,.18)`;
 
-function willChangeToggle(el: Element) {
+/** Hint the compositor only while a scrubbed element is actually moving. */
+function willChangeWhileActive(el: HTMLElement) {
   return {
-    onToggle: (self: ScrollTrigger) => {
-      (el as HTMLElement).style.willChange = self.isActive ? "transform" : "auto";
+    onToggle: (self: ScrollTriggerType) => {
+      el.style.willChange = self.isActive ? "transform" : "auto";
     },
   };
 }
 
-export function useScrollFx(refs: ScrollFxRefs) {
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const mm = gsap.matchMedia();
+/**
+ * Scroll-linked effects. Call inside a gsap.context(); everything created here
+ * is reverted with it. Skipped entirely when the user prefers reduced motion.
+ */
+export function setupScrollFx(gsap: Gsap, ScrollTrigger: typeof ScrollTriggerType) {
+  const mm = gsap.matchMedia();
 
-      mm.add(
-        {
-          motionOK: "(prefers-reduced-motion: no-preference)",
-          isDesktop: "(min-width: 900px)",
-          isStepsVertical: "(max-width: 859px)",
-        },
-        (context) => {
-          const { motionOK, isDesktop, isStepsVertical } = (context.conditions ?? {}) as Record<string, boolean>;
-          if (!motionOK) return;
+  mm.add(
+    {
+      motionOK: "(prefers-reduced-motion: no-preference)",
+      isDesktop: "(min-width: 900px)",
+      isStepsVertical: "(max-width: 859px)",
+    },
+    (context) => {
+      const { motionOK, isDesktop, isStepsVertical } = context.conditions as Record<string, boolean>;
+      if (!motionOK) return;
 
-          const cleanups: Array<() => void> = [];
+      // Reading progress bar along the top edge.
+      const bar = fx("progress");
+      if (bar) {
+        gsap.set(bar, { scaleX: 0, transformOrigin: "left center" });
+        ScrollTrigger.create({
+          trigger: document.documentElement,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.3,
+          onUpdate: (self) => gsap.set(bar, { scaleX: self.progress }),
+        });
+      }
 
-          if (refs.topBar.current) {
-            const bar = refs.topBar.current;
-            gsap.set(bar, { scaleX: 0, transformOrigin: "left center" });
-            const st = ScrollTrigger.create({
-              trigger: document.documentElement,
-              start: "top top",
-              end: "bottom bottom",
-              scrub: 0.3,
-              onUpdate: (self) => gsap.set(bar, { scaleX: self.progress }),
-            });
-            cleanups.push(() => st.kill());
+      // Hero: background drifts down, copy drifts up.
+      const hero = document.getElementById("top");
+      const heroBg = fx("hero-bg");
+      const heroContent = fx("hero-content");
+      if (hero && heroBg) {
+        // y: 0 replaces the CSS starting offset instead of stacking on it.
+        gsap.fromTo(
+          heroBg,
+          { y: 0, yPercent: -8 },
+          {
+            yPercent: 12,
+            ease: "none",
+            scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: 1.2, ...willChangeWhileActive(heroBg) },
           }
+        );
+      }
+      if (hero && heroContent) {
+        gsap.fromTo(
+          heroContent,
+          { yPercent: 0 },
+          { yPercent: -14, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: 1.2 } }
+        );
+      }
 
-          if (refs.heroSection.current && refs.heroBgWrap.current) {
-            const el = refs.heroBgWrap.current;
-            const tween = gsap.fromTo(
-              el,
-              { yPercent: -8 },
-              {
-                yPercent: 12,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: refs.heroSection.current,
-                  start: "top top",
-                  end: "bottom top",
-                  scrub: 1.2,
-                  ...willChangeToggle(el),
-                },
-              }
-            );
-            cleanups.push(() => tween.scrollTrigger?.kill());
-          }
+      // About (desktop): slow zoom + vignette across the section.
+      const about = document.getElementById("o-podjetju");
+      const aboutImg = fx("about-img");
+      if (isDesktop && about && aboutImg) {
+        const tl = gsap.timeline({
+          scrollTrigger: { trigger: about, start: "top top", end: "bottom bottom", scrub: 1, ...willChangeWhileActive(aboutImg) },
+        });
+        tl.fromTo(aboutImg, { scale: 1 }, { scale: 1.05, ease: "none" }, 0);
+        const vignette = fx("about-vignette");
+        if (vignette) tl.fromTo(vignette, { opacity: 0 }, { opacity: 0.45, ease: "none" }, 0);
+      }
 
-          if (refs.heroSection.current && refs.heroContent.current) {
-            const tween = gsap.fromTo(
-              refs.heroContent.current,
-              { yPercent: 0 },
-              {
-                yPercent: -14,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: refs.heroSection.current,
-                  start: "top top",
-                  end: "bottom top",
-                  scrub: 1.2,
-                },
-              }
-            );
-            cleanups.push(() => tween.scrollTrigger?.kill());
-          }
+      // Principle accent rules draw in.
+      fxAll("principle-rule").forEach((rule, i) => {
+        gsap.set(rule, { scaleX: 0, transformOrigin: "left center" });
+        ScrollTrigger.create({
+          trigger: rule,
+          start: "top 85%",
+          onEnter: () => gsap.to(rule, { scaleX: 1, duration: 0.7, delay: i * 0.08, ease: "cubic-bezier(0.16,1,0.3,1)" }),
+          onLeaveBack: () => gsap.to(rule, { scaleX: 0, duration: 0.4, ease: "power2.in" }),
+        });
+      });
 
-          if (isDesktop && refs.aboutSection.current && refs.aboutImg.current) {
-            const img = refs.aboutImg.current;
-            const tl = gsap.timeline({
-              scrollTrigger: {
-                trigger: refs.aboutSection.current,
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1,
-                ...willChangeToggle(img),
-              },
-            });
-            tl.fromTo(img, { scale: 1 }, { scale: 1.05, ease: "none" }, 0);
-            if (refs.aboutVignette.current) {
-              tl.fromTo(refs.aboutVignette.current, { opacity: 0 }, { opacity: 0.45, ease: "none" }, 0);
-            }
-            cleanups.push(() => tl.scrollTrigger?.kill());
-          }
-
-          (refs.principleDividers.current || []).forEach((el, i) => {
-            if (!el) return;
-            gsap.set(el, { scaleX: 0, transformOrigin: "left center" });
-            const st = ScrollTrigger.create({
-              trigger: el,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-              onEnter: () =>
-                gsap.to(el, { scaleX: 1, duration: 0.7, delay: i * 0.08, ease: "cubic-bezier(0.16,1,0.3,1)" }),
-              onLeaveBack: () => gsap.to(el, { scaleX: 0, duration: 0.4, ease: "power2.in" }),
-            });
-            cleanups.push(() => st.kill());
-          });
-
-          if (refs.quoteSection.current) {
-            const el = refs.quoteSection.current;
-            gsap.set(el, { clipPath: isDesktop ? "inset(8% 4% round 16px)" : "inset(6% 3% round 8px)" });
-            const tween = gsap.to(el, {
-              clipPath: "inset(0% 0% round 0px)",
-              ease: "none",
-              scrollTrigger: { trigger: el, start: "top 90%", end: "top 30%", scrub: 1 },
-            });
-            cleanups.push(() => tween.scrollTrigger?.kill());
-          }
-
-          if (refs.quoteSection.current && refs.quoteHeading.current) {
-            const tween = gsap.fromTo(
-              refs.quoteHeading.current,
-              { yPercent: 6 },
-              {
-                yPercent: -6,
-                ease: "none",
-                scrollTrigger: { trigger: refs.quoteSection.current, start: "top bottom", end: "bottom top", scrub: 1.4 },
-              }
-            );
-            cleanups.push(() => tween.scrollTrigger?.kill());
-          }
-
-          if (refs.stepsContainer.current && refs.stepsBar.current) {
-            const bar = refs.stepsBar.current;
-            const dots = refs.stepDots.current || [];
-            const nums = refs.stepNums.current || [];
-            const count = dots.length;
-            const barProp = isStepsVertical ? "scaleY" : "scaleX";
-            gsap.set(bar, {
-              scaleX: 1,
-              scaleY: 1,
-              [barProp]: 0,
-              transformOrigin: isStepsVertical ? "center top" : "left center",
-            });
-            dots.forEach((d) => {
-              if (d) gsap.set(d, { backgroundColor: "#e6ded3", scale: 1, boxShadow: "0 0 0 5px #fff, 0 0 0 0px rgba(232,116,36,.18)" });
-            });
-            nums.forEach((n) => {
-              if (n) gsap.set(n, { color: "#e9e2d8" });
-            });
-            if (count > 1) {
-              const activeFlags = new Array(count).fill(false);
-              const st = ScrollTrigger.create({
-                trigger: refs.stepsContainer.current,
-                start: "top 80%",
-                end: "bottom 30%",
-                scrub: 1,
-                onUpdate: (self) => {
-                  gsap.set(bar, { [barProp]: self.progress });
-                  dots.forEach((d, i) => {
-                    const active = self.progress >= i / (count - 1) - 0.02;
-                    if (active === activeFlags[i]) return;
-                    activeFlags[i] = active;
-                    if (d) {
-                      gsap.to(d, {
-                        backgroundColor: active ? "#e87424" : "#e6ded3",
-                        scale: active ? 1.15 : 1,
-                        boxShadow: active
-                          ? "0 0 0 5px #fff, 0 0 0 3px rgba(232,116,36,.18)"
-                          : "0 0 0 5px #fff, 0 0 0 0px rgba(232,116,36,.18)",
-                        duration: 0.45,
-                        ease: "power2.out",
-                        overwrite: true,
-                      });
-                    }
-                    const n = nums[i];
-                    if (n) gsap.to(n, { color: active ? "#f0a46b" : "#e9e2d8", duration: 0.6, overwrite: true });
-                  });
-                },
-              });
-              cleanups.push(() => st.kill());
-            }
-          }
-
-          if (refs.contactCard.current) {
-            const el = refs.contactCard.current;
-            gsap.set(el, { y: 30, opacity: 0 });
-            const st = ScrollTrigger.create({
-              trigger: el,
-              start: "top 85%",
-              toggleActions: "play none none reverse",
-              onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 1, ease: "power3.out" }),
-              onLeaveBack: () => gsap.to(el, { y: 30, opacity: 0, duration: 0.5, ease: "power2.in" }),
-            });
-            cleanups.push(() => st.kill());
-          }
-
-          if (refs.contactSection.current && refs.contactGlow.current) {
-            const el = refs.contactGlow.current;
-            gsap.set(el, { opacity: 0 });
-            const tween = gsap.to(el, {
-              opacity: 0.55,
-              ease: "none",
-              scrollTrigger: { trigger: refs.contactSection.current, start: "bottom 90%", end: "bottom 25%", scrub: 1 },
-            });
-            cleanups.push(() => tween.scrollTrigger?.kill());
-          }
-
-          return () => cleanups.forEach((fn) => fn());
+      // Quote: rounded inset opens to full bleed; heading drifts.
+      const quote = fx("quote");
+      if (quote) {
+        gsap.set(quote, { clipPath: isDesktop ? "inset(8% 4% round 16px)" : "inset(6% 3% round 8px)" });
+        gsap.to(quote, {
+          clipPath: "inset(0% 0% round 0px)",
+          ease: "none",
+          scrollTrigger: { trigger: quote, start: "top 90%", end: "top 30%", scrub: 1 },
+        });
+        const heading = fx("quote-heading");
+        if (heading) {
+          gsap.fromTo(
+            heading,
+            { yPercent: 6 },
+            { yPercent: -6, ease: "none", scrollTrigger: { trigger: quote, start: "top bottom", end: "bottom top", scrub: 1.4 } }
+          );
         }
-      );
-    });
+      }
 
-    return () => ctx.revert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+      // Process timeline: the rail fills and each step lights up as it's reached.
+      const steps = fx("steps");
+      const stepsBar = fx("steps-bar");
+      if (steps && stepsBar) {
+        const dots = fxAll("step-dot");
+        const nums = fxAll("step-num");
+        const barProp = isStepsVertical ? "scaleY" : "scaleX";
+        gsap.set(stepsBar, {
+          scaleX: 1,
+          scaleY: 1,
+          [barProp]: 0,
+          transformOrigin: isStepsVertical ? "center top" : "left center",
+        });
+        dots.forEach((d) => gsap.set(d, { backgroundColor: STEP_IDLE, scale: 1, boxShadow: ringShadow(0) }));
+        nums.forEach((n) => gsap.set(n, { color: STEP_NUM_IDLE }));
+
+        if (dots.length > 1) {
+          const active = dots.map(() => false);
+          ScrollTrigger.create({
+            trigger: steps,
+            start: "top 80%",
+            end: "bottom 30%",
+            scrub: 1,
+            onUpdate: (self) => {
+              gsap.set(stepsBar, { [barProp]: self.progress });
+              dots.forEach((dot, i) => {
+                const isActive = self.progress >= i / (dots.length - 1) - 0.02;
+                if (isActive === active[i]) return;
+                active[i] = isActive;
+                gsap.to(dot, {
+                  backgroundColor: isActive ? STEP_ACTIVE : STEP_IDLE,
+                  scale: isActive ? 1.15 : 1,
+                  boxShadow: ringShadow(isActive ? 3 : 0),
+                  duration: 0.45,
+                  ease: "power2.out",
+                  overwrite: true,
+                });
+                if (nums[i]) gsap.to(nums[i], { color: isActive ? STEP_NUM_ACTIVE : STEP_NUM_IDLE, duration: 0.6, overwrite: true });
+              });
+            },
+          });
+        }
+      }
+
+      // Inquiry form fades up.
+      const card = fx("contact-card");
+      if (card) {
+        gsap.set(card, { y: 30, opacity: 0 });
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top 85%",
+          onEnter: () => gsap.to(card, { y: 0, opacity: 1, duration: 1, ease: "power3.out" }),
+          onLeaveBack: () => gsap.to(card, { y: 30, opacity: 0, duration: 0.5, ease: "power2.in" }),
+        });
+      }
+    }
+  );
 }
