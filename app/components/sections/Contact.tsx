@@ -15,7 +15,7 @@ export function Contact() {
 
           <div className={styles.details}>
             <a href={company.phoneHref} className={`${styles.row} ${styles.rowLink}`}>
-              <span className={`font-barlow-condensed ${styles.rowLabel}`}>Mobitel</span>
+              <span className={`font-barlow-condensed ${styles.rowLabel}`}>GSM</span>
               <span className={`font-archivo ${styles.rowValue} ${styles.phone}`}>{company.phone}</span>
             </a>
             <a href={company.emailHref} className={`${styles.row} ${styles.rowLink}`}>

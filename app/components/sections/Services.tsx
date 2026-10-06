@@ -24,7 +24,7 @@ export function Services() {
             <div>
               <SectionEyebrow index="02" label="Storitve" />
               <h2 className={`font-archivo ${styles.title}`}>
-                Tri storitve,
+                Celovite storitve,
                 <br />
                 za vaš projekt.
               </h2>

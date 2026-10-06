@@ -18,7 +18,7 @@ type Field = {
 const fields: Field[] = [
   { id: "kf-ime", name: "ime", label: "Ime in priimek", type: "text", autoComplete: "name", required: true, full: true },
   { id: "kf-email", name: "email", label: "E-pošta", type: "email", autoComplete: "email", required: true },
-  { id: "kf-tel", name: "telefon", label: "Telefon", type: "tel", autoComplete: "tel" },
+  { id: "kf-tel", name: "telefon", label: "GSM", type: "tel", autoComplete: "tel" },
   { id: "kf-opis", name: "sporocilo", label: "Kratek opis projekta", type: "textarea", full: true },
 ];
 
