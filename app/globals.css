@@ -2,6 +2,22 @@
   --accent: #e87424;
   --accent-light: #f2903f;
   --accent-dark: #c75c12;
+
+  /* Horizontal page gutter. Desktop value is unchanged; phones get a tighter,
+     width-aware gutter (18px at 320 → 24px at 430+). */
+  --page-gutter: clamp(24px, 5vw, 110px);
+
+  /* Scroll-reveal motion; softened on phones. */
+  --reveal-shift: 24px;
+  --reveal-dur: 0.9s;
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-gutter: clamp(18px, 5.6vw, 24px);
+    --reveal-shift: 14px;
+    --reveal-dur: 0.7s;
+  }
 }
 
 *,
@@ -42,6 +58,12 @@ textarea,
 button {
   font: inherit;
   color: inherit;
+}
+
+/* Touch: replace the grey system tap flash with per-component :active states. */
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .font-archivo {

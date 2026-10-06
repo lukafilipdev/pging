@@ -43,12 +43,12 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>(delay = 0) {
     ? { opacity: 1, transform: "none", clipPath: "none" }
     : {
         opacity: shown ? 1 : 0,
-        transform: shown ? "none" : "translateY(24px)",
+        transform: shown ? "none" : "translateY(var(--reveal-shift))",
         clipPath: shown ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)",
         transition: [
-          `opacity .9s cubic-bezier(.16,1,.3,1) ${delay}ms`,
-          `transform .9s cubic-bezier(.16,1,.3,1) ${delay}ms`,
-          `clip-path .9s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+          `opacity var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
+          `transform var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
+          `clip-path var(--reveal-dur) cubic-bezier(.16,1,.3,1) ${delay}ms`,
         ].join(", "),
       };
 

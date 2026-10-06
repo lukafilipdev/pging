@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { services } from "../lib/data";
 import styles from "./ServiceSheet.module.css";
 
@@ -95,7 +96,7 @@ export default function ServiceSheet({
         <div ref={scrollRef} className={styles.scroll}>
           <div key={`${openCount}-${shown}`} className={styles.content}>
             <div className={styles.media}>
-              <img src={s.image} alt={s.alt} className={styles.mediaImg} />
+              <Image src={s.image} alt={s.alt} fill sizes="(min-width: 760px) 760px, 100vw" className={styles.mediaImg} />
               <div className={styles.mediaShade} aria-hidden />
               <div className={styles.mediaCaption}>
                 <span className={`font-archivo ${styles.num}`}>{s.num}</span>

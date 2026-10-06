@@ -138,7 +138,7 @@ export function useScrollFx(refs: ScrollFxRefs) {
 
           if (refs.quoteSection.current) {
             const el = refs.quoteSection.current;
-            gsap.set(el, { clipPath: "inset(8% 4% round 16px)" });
+            gsap.set(el, { clipPath: isDesktop ? "inset(8% 4% round 16px)" : "inset(6% 3% round 8px)" });
             const tween = gsap.to(el, {
               clipPath: "inset(0% 0% round 0px)",
               ease: "none",

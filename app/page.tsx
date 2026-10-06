@@ -7,20 +7,31 @@ import { useActiveSection, useCssVarFromHeight, useHeaderSolid, useQuoteParallax
 import { useScrollFx, type ScrollFxRefs } from "./lib/scrollFx";
 import { OPEN_COOKIE_SETTINGS_EVENT } from "./lib/consent";
 import Link from "next/link";
+import Image, { getImageProps } from "next/image";
 import ServiceSheet from "./components/ServiceSheet";
+
+// Hero art direction: portrait crop on phones, landscape above. Both are served
+// through the image optimizer so phones never download the 2.7k-wide originals.
+const heroImgCommon = { alt: "Sodobna vila v večernem svetlobi", sizes: "100vw", fetchPriority: "high", loading: "eager" } as const;
+const {
+  props: { srcSet: heroMobileSrcSet },
+} = getImageProps({ ...heroImgCommon, src: "/uploads/mobilehero.jpeg", width: 1536, height: 2752 });
+const { props: heroImgProps } = getImageProps({ ...heroImgCommon, src: "/uploads/hero2.jpeg", width: 2752, height: 1536 });
 
 function Reveal({
   children,
   delay = 0,
   style,
+  className,
 }: {
   children: React.ReactNode;
   delay?: number;
   style?: React.CSSProperties;
+  className?: string;
 }) {
   const { ref, style: revealStyle } = useReveal<HTMLDivElement>(delay);
   return (
-    <div ref={ref} style={{ ...style, ...revealStyle }}>
+    <div ref={ref} className={className} style={{ ...style, ...revealStyle }}>
       {children}
     </div>
   );
@@ -139,8 +150,8 @@ export default function Home() {
   const containerStyle: CSSProperties = {
     maxWidth: 2100,
     margin: "0 auto",
-    paddingLeft: "clamp(24px,5vw,110px)",
-    paddingRight: "clamp(24px,5vw,110px)",
+    paddingLeft: "var(--page-gutter)",
+    paddingRight: "var(--page-gutter)",
   };
 
   const navItems = [
@@ -199,9 +210,12 @@ export default function Home() {
           }}
         >
           <a href="#top" style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }} onClick={() => setMenuOpen(false)}>
-            <img
+            <Image
               src={headerSolid ? "/uploads/logo.png" : "/uploads/logo-white.png"}
               alt="PG Inženiring"
+              width={74}
+              height={74}
+              preload
               className={styles.logoImg}
               style={{
                 width: 74,
@@ -304,41 +318,11 @@ export default function Home() {
               aria-label={menuOpen ? "Zapri meni" : "Meni"}
               aria-expanded={menuOpen}
               className={styles.burger}
-              style={{
-                background: headerSolid ? "transparent" : "rgba(0,0,0,.18)",
-                border: `1px solid ${headerSolid ? "#e0dad3" : "rgba(255,255,255,.45)"}`,
-                borderRadius: 2,
-                width: 44,
-                height: 44,
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                flexDirection: "column",
-                gap: 5,
-                position: "relative",
-                zIndex: 71,
-              }}
+              data-solid={headerSolid}
+              data-open={menuOpen}
             >
-              <span
-                style={{
-                  display: "block",
-                  width: 18,
-                  height: 2,
-                  background: headerSolid ? "#4a453f" : "#fff",
-                  transition: "transform .35s cubic-bezier(.16,1,.3,1), background .3s ease",
-                  transform: menuOpen ? "translateY(3.5px) rotate(45deg)" : "none",
-                }}
-              />
-              <span
-                style={{
-                  display: "block",
-                  width: 18,
-                  height: 2,
-                  background: headerSolid ? "#4a453f" : "#fff",
-                  transition: "transform .35s cubic-bezier(.16,1,.3,1), background .3s ease",
-                  transform: menuOpen ? "translateY(-3.5px) rotate(-45deg)" : "none",
-                }}
-              />
+              <span className={styles.burgerLine} />
+              <span className={styles.burgerLine} />
             </button>
           </nav>
         </div>
@@ -407,10 +391,10 @@ export default function Home() {
         <div className={styles.heroComposition}>
         <div ref={heroBgWrapRef} style={{ position: "absolute", top: "8%", left: 0, right: 0, bottom: "-10%" }}>
           <picture>
-            <source media="(max-width: 680px)" srcSet="/uploads/mobilehero.jpeg" />
+            <source media="(max-width: 680px)" srcSet={heroMobileSrcSet} sizes="100vw" />
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- alt comes from heroImgProps */}
             <img
-              src="/uploads/hero2.jpeg"
-              alt="Sodobna vila v večernem svetlobi"
+              {...heroImgProps}
               style={{
                 width: "100%",
                 height: "100%",
@@ -444,14 +428,14 @@ export default function Home() {
             <div
               className={`font-barlow-condensed ${styles.mobileEyebrow}`}
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 lineHeight: 1.2,
-                letterSpacing: ".26em",
+                letterSpacing: ".24em",
                 textTransform: "uppercase",
                 textAlign: "center",
-                color: "rgba(255,255,255,.8)",
-                margin: "0 0 clamp(16px,4vh,28px)",
+                color: "rgba(255,255,255,.9)",
+                margin: "0 0 clamp(12px,2.4vh,20px)",
                 textShadow: "0 1px 8px rgba(0,0,0,.6)",
                 animation: "pgUp 1s .2s cubic-bezier(.16,1,.3,1) both",
               }}
@@ -460,11 +444,9 @@ export default function Home() {
             </div>
 
             <h1
-              className="font-display"
+              className={`font-display ${styles.heroTitle}`}
               style={{
                 fontWeight: 400,
-                fontSize: "clamp(70px,19.6vw,406px)",
-                lineHeight: 1.14,
                 letterSpacing: "0em",
                 textTransform: "uppercase",
                 margin: 0,
@@ -484,7 +466,7 @@ export default function Home() {
                 flexDirection: "column",
                 alignItems: "center",
                 gap: 16,
-                marginTop: "clamp(0px,1vh,8px)",
+                marginTop: "clamp(14px,2.2vh,20px)",
                 animation: "pgUp 1s .4s cubic-bezier(.16,1,.3,1) both",
               }}
             >
@@ -492,13 +474,13 @@ export default function Home() {
               <p
                 className="font-barlow-condensed"
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 14,
                   fontWeight: 600,
-                  letterSpacing: ".18em",
+                  letterSpacing: ".16em",
                   textTransform: "uppercase",
                   textAlign: "center",
-                  lineHeight: 1.9,
-                  color: "rgba(255,255,255,.8)",
+                  lineHeight: 1.75,
+                  color: "rgba(255,255,255,.9)",
                   margin: 0,
                   textShadow: "0 1px 8px rgba(0,0,0,.6)",
                 }}
@@ -570,8 +552,8 @@ export default function Home() {
                   <span className={styles.scrollCueDot} />
                 </span>
                 <span
-                  className="font-barlow-condensed"
-                  style={{ fontSize: 11, letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }}
+                  className={`font-barlow-condensed ${styles.scrollCueLabel}`}
+                  style={{ letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }}
                 >
                   Razišči
                 </span>
@@ -625,32 +607,15 @@ export default function Home() {
                 <a
                   key={m.title}
                   href="#storitve"
+                  className={styles.heroMark}
                   style={{
-                    flex: 1,
-                    textAlign: "center",
-                    padding: "0 6px",
-                    borderLeft: i > 0 ? "1px solid rgba(255,255,255,.15)" : "none",
+                    borderLeft: i > 0 ? "1px solid rgba(255,255,255,.18)" : "none",
                     animation: `pgUp .8s ${(0.85 + i * 0.1).toFixed(2)}s cubic-bezier(.16,1,.3,1) backwards`,
                   }}
                 >
-                  <div className="font-archivo" style={{ fontWeight: 700, fontSize: 22, color: "rgba(255,255,255,.5)" }}>
-                    0{i + 1}
-                  </div>
-                  <div
-                    className="font-archivo"
-                    style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", marginTop: 6 }}
-                  >
-                    {m.title}
-                  </div>
-                  <span
-                    style={{
-                      display: "block",
-                      width: 32,
-                      height: 2,
-                      margin: "12px auto 0",
-                      background: i === 0 ? "var(--accent)" : "rgba(255,255,255,.28)",
-                    }}
-                  />
+                  <span className={`font-archivo ${styles.heroMarkNum}`}>0{i + 1}</span>
+                  <span className={`font-barlow-condensed ${styles.heroMarkTitle}`}>{m.title}</span>
+                  <span className={styles.heroMarkRule} data-first={i === 0} aria-hidden />
                 </a>
               ))}
             </div>
@@ -663,8 +628,8 @@ export default function Home() {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 12,
-                marginTop: "clamp(28px,6vh,44px)",
+                gap: 10,
+                marginTop: "clamp(22px,4.4vh,36px)",
                 animation: "pgUp 1s .8s cubic-bezier(.16,1,.3,1) both",
               }}
             >
@@ -673,7 +638,7 @@ export default function Home() {
               </span>
               <span
                 className="font-barlow-condensed"
-                style={{ fontSize: 11, letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.6)" }}
+                style={{ fontSize: 12, letterSpacing: ".24em", textTransform: "uppercase", color: "rgba(255,255,255,.72)" }}
               >
                 Razišči
               </span>
@@ -726,16 +691,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={170}>
-              <p
-                style={{
-                  fontSize: "clamp(16px,1.3vw,19px)",
-                  lineHeight: 1.75,
-                  color: "#5a544c",
-                  margin: "30px 0 0",
-                  maxWidth: "50ch",
-                  textWrap: "pretty",
-                }}
-              >
+              <p className={styles.aboutLead}>
                 PG INŽENIRING d.o.o. je majhno podjetje iz Gornjih Slaveč v Prekmurju, katero projektira,
                 gradi in nadzira vse vrste objektov, pod eno streho. Vaše želje povezujemo z našim znanjem
                 in izkušnjami ter vas osebno vodimo skozi celoten proces, od prvega ogleda parcele do
@@ -745,12 +701,15 @@ export default function Home() {
 
           </div>
 
-          <Reveal delay={140}>
+          <Reveal delay={140} className={styles.aboutImageReveal}>
             <div className={styles.aboutImageFrame}>
-              <img
+              <Image
                 ref={aboutImgRef}
                 src="/uploads/photo2.png"
                 alt="Delovni prostor s projektno dokumentacijo"
+                width={1672}
+                height={941}
+                sizes="(min-width: 900px) 52vw, 100vw"
                 style={{
                   position: "absolute",
                   inset: "-6% 0",
@@ -777,12 +736,9 @@ export default function Home() {
                   pointerEvents: "none",
                 }}
               />
-              <div style={{ position: "absolute", left: 18, right: 18, bottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+              <div className={styles.aboutImageCaption}>
                 <span style={{ width: 22, height: 2, background: "var(--accent-light)", flexShrink: 0 }} />
-                <span
-                  className="font-barlow-condensed"
-                  style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: "#fff" }}
-                >
+                <span className={`font-barlow-condensed ${styles.aboutImageCaptionText}`}>
                   Prekmurje, Slovenija
                 </span>
               </div>
@@ -810,15 +766,13 @@ export default function Home() {
       </section>
 
       <section ref={quoteSectionRef} style={{ position: "relative", overflow: "hidden", background: "#14110e" }}>
-        <img
+        <Image
           ref={quoteImgRef}
           src="/uploads/photo3.png"
           alt=""
+          fill
+          sizes="100vw"
           style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
             objectFit: "cover",
             objectPosition: "55% 30%",
             opacity: 0.9,
@@ -826,68 +780,27 @@ export default function Home() {
             willChange: "transform",
           }}
         />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(180deg, rgba(14,11,8,.34) 0%, rgba(14,11,8,0) 22%, rgba(14,11,8,0) 70%, rgba(14,11,8,.42) 100%), linear-gradient(100deg, rgba(14,11,8,.86) 0%, rgba(14,11,8,.7) 34%, rgba(14,11,8,.36) 64%, rgba(14,11,8,.12) 100%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div style={{ ...containerStyle, position: "relative", paddingTop: "clamp(80px,11vw,150px)", paddingBottom: "clamp(80px,11vw,150px)" }}>
+        <div className={styles.quoteOverlay} />
+        <div className={styles.quoteInner} style={{ ...containerStyle, position: "relative" }}>
           <div ref={quoteHeadingRef}>
           <Reveal style={{ maxWidth: 900 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <span style={{ display: "block", width: 40, height: 2, background: "var(--accent)" }} />
-              <span
-                className="font-barlow-condensed"
-                style={{ fontSize: 13, letterSpacing: ".26em", textTransform: "uppercase", color: "rgba(255,255,255,.66)" }}
-              >
-                Naše prepričanje
-              </span>
+              <span className={`font-barlow-condensed ${styles.quoteLabel}`}>Naše prepričanje</span>
             </div>
-            <blockquote
-              className="font-archivo"
-              style={{
-                margin: "clamp(22px,3vw,34px) 0 0",
-                fontWeight: 600,
-                fontSize: "clamp(26px,4vw,52px)",
-                lineHeight: 1.16,
-                letterSpacing: "-.028em",
-                color: "#fff",
-                textWrap: "pretty",
-              }}
-            >
+            <blockquote className={`font-archivo ${styles.quoteText}`}>
               Najboljši projekti nastanejo, ko se{" "}
               <span style={{ color: "var(--accent-light)" }}>vaše želje</span> srečajo z našim znanjem,
               izkušnjami in odgovornostjo.
             </blockquote>
-            <div
-              className="font-barlow-condensed"
-              style={{
-                fontSize: 13,
-                letterSpacing: ".2em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,.56)",
-                marginTop: "clamp(24px,3vw,36px)",
-              }}
-            >
-              Ekipa PG Inženiring
-            </div>
+            <div className={`font-barlow-condensed ${styles.quoteSign}`}>Ekipa PG Inženiring</div>
           </Reveal>
           </div>
         </div>
       </section>
 
       <section id="storitve" className={styles.storitveSection} style={{ background: "#fbfaf9", position: "relative" }}>
-        <div
-          className={styles.storitveIntroWrap}
-          style={{
-            paddingLeft: "clamp(20px,5vw,40px)",
-            paddingRight: "clamp(20px,5vw,40px)",
-          }}
-        >
+        <div className={styles.storitveIntroWrap}>
           <Reveal style={{ width: "100%" }}>
             <div className={styles.storitveIntroRow}>
             <div>
@@ -920,10 +833,7 @@ export default function Home() {
             </div>
             <div style={{ display: "flex", gap: "clamp(20px,3vw,36px)", alignItems: "flex-start" }}>
               <span style={{ display: "block", width: 1, alignSelf: "stretch", background: "#e9e2d9", flexShrink: 0 }} aria-hidden />
-              <p
-                className={styles.storitveIntroText}
-                style={{ fontSize: "clamp(14px,1.2vw,17px)", lineHeight: 1.6, color: "#7d766d", margin: 0, maxWidth: "40ch", textWrap: "pretty" }}
-              >
+              <p className={styles.storitveIntroText}>
                 Od prve ideje do predaje objekta. Povezujemo znanje, izkušnje in odgovornost, da lahko vaš
                 projekt poteka enostavno, varno in zanesljivo.
               </p>
@@ -988,11 +898,18 @@ export default function Home() {
               <Reveal key={s.num} delay={s.delay} style={{ height: "100%" }}>
                 <article
                   className={styles.servicePanel}
+                  data-active={activeService === i}
                   ref={(el) => {
                     storitvePanelRefs.current[i] = el;
                   }}
                 >
-                  <img src={s.image} alt={s.alt} className={styles.servicePanelImg} />
+                  <Image
+                    src={s.image}
+                    alt={s.alt}
+                    fill
+                    sizes="(min-width: 900px) 34vw, (min-width: 600px) 62vw, 90vw"
+                    className={styles.servicePanelImg}
+                  />
                   <div className={styles.servicePanelOverlay} aria-hidden />
                   <div className={styles.servicePanelHead} aria-hidden>
                     <span className={`font-archivo ${styles.servicePanelNum}`}>{s.num}</span>
@@ -1066,7 +983,7 @@ export default function Home() {
       </section>
 
       <section style={{ background: "#fff" }}>
-        <div style={{ ...containerStyle, paddingTop: "clamp(72px,10vw,140px)", paddingBottom: "clamp(72px,10vw,140px)" }}>
+        <div className={styles.stepsInner} style={containerStyle}>
           <Reveal style={{ maxWidth: 640 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
               <span className="font-archivo" style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".12em", color: "#cfc7bd" }}>
@@ -1093,7 +1010,7 @@ export default function Home() {
               Od klepeta do ključa
             </h2>
           </Reveal>
-          <div ref={stepsContainerRef} style={{ position: "relative", marginTop: "clamp(44px,6vw,72px)" }}>
+          <div ref={stepsContainerRef} className={styles.stepsContainer}>
             <div className={styles.stepsTrack} />
             <div ref={stepsBarRef} className={styles.stepsBar} />
             <div className={styles.stepsGrid}>
@@ -1128,14 +1045,7 @@ export default function Home() {
       </section>
 
       <section id="kontakt" ref={contactSectionRef} style={{ background: "#fbfaf9", borderTop: "1px solid #f0ebe5", position: "relative" }}>
-        <div
-          className={styles.contactGrid}
-          style={{
-            ...containerStyle,
-            paddingTop: "clamp(64px,9vw,120px)",
-            paddingBottom: "clamp(64px,9vw,120px)",
-          }}
-        >
+        <div className={styles.contactGrid} style={containerStyle}>
           <Reveal>
             <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
               <span className="font-archivo" style={{ fontWeight: 700, fontSize: 12, letterSpacing: ".12em", color: "#cfc7bd" }}>
@@ -1166,54 +1076,33 @@ export default function Home() {
             </p>
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <a
-                href="tel:070799810"
-                className={styles.contactLine}
-                style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "20px 2px", borderTop: "1px solid #e9e2d9", color: "#26231f" }}
-              >
-                <span className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#a09889" }}>
-                  Mobitel
-                </span>
-                <span className="font-archivo" style={{ fontWeight: 600, fontSize: "clamp(18px,1.7vw,23px)", letterSpacing: "-.015em" }}>
-                  070 799 810
-                </span>
+              <a href="tel:070799810" className={`${styles.contactLine} ${styles.contactRow}`}>
+                <span className={`font-barlow-condensed ${styles.contactRowLabel}`}>Mobitel</span>
+                <span className={`font-archivo ${styles.contactRowValue} ${styles.contactRowPhone}`}>070 799 810</span>
               </a>
-              <a
-                href="mailto:info@pg-inzeniring.si"
-                className={styles.contactLine}
-                style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 18, padding: "20px 2px", borderTop: "1px solid #e9e2d9", color: "#26231f" }}
-              >
-                <span className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#a09889" }}>
-                  E-pošta
-                </span>
-                <span className="font-archivo" style={{ fontWeight: 600, fontSize: "clamp(16px,1.5vw,21px)", letterSpacing: "-.015em", wordBreak: "break-word" }}>
-                  info@pg-inzeniring.si
-                </span>
+              <a href="mailto:info@pg-inzeniring.si" className={`${styles.contactLine} ${styles.contactRow}`}>
+                <span className={`font-barlow-condensed ${styles.contactRowLabel}`}>E-pošta</span>
+                <span className={`font-archivo ${styles.contactRowValue} ${styles.contactRowEmail}`}>info@pg-inzeniring.si</span>
               </a>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  gap: 18,
-                  padding: "20px 2px",
-                  borderTop: "1px solid #e9e2d9",
-                  borderBottom: "1px solid #e9e2d9",
-                }}
-              >
-                <span className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#a09889" }}>
-                  Naslov
-                </span>
-                <span style={{ fontSize: 16, lineHeight: 1.5, textAlign: "right", color: "#4a453f" }}>
+              <div className={`${styles.contactRow} ${styles.contactRowLast}`}>
+                <span className={`font-barlow-condensed ${styles.contactRowLabel}`}>Naslov</span>
+                <span className={styles.contactRowAddress}>
                   PG INŽENIRING d.o.o.
                   <br />
                   Gornji Slaveči 97, 9263 Kuzma
                 </span>
               </div>
             </div>
+
+            <a href="#povprasevanje" className={`font-archivo ${styles.contactMobileCta}`}>
+              Pošlji povpraševanje
+              <span className={styles.formSubmitArrow} aria-hidden>
+                →
+              </span>
+            </a>
           </Reveal>
 
-          <div ref={contactCardRef} className={styles.contactFormCol} style={{ opacity: 1 }}>
+          <div ref={contactCardRef} id="povprasevanje" className={styles.contactFormCol} style={{ opacity: 1 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <span style={{ display: "block", width: 32, height: 2, background: "var(--accent)" }} />
               <span
@@ -1295,18 +1184,8 @@ export default function Home() {
       </section>
 
       <footer style={{ background: "#14110e", color: "#e7e2db", overflow: "hidden" }}>
-        <div
-          style={{
-            ...containerStyle,
-            paddingTop: "clamp(56px,7vw,96px)",
-            paddingBottom: "clamp(32px,4vw,48px)",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))",
-            gap: "clamp(30px,4vw,60px)",
-            alignItems: "start",
-          }}
-        >
-          <div>
+        <div className={styles.footerGrid} style={containerStyle}>
+          <div className={styles.footerBrand}>
             <div className="font-archivo" style={{ fontWeight: 700, fontSize: "clamp(20px,1.8vw,24px)", letterSpacing: "-.018em", color: "#fff" }}>
               PG INŽENIRING d.o.o.
             </div>
@@ -1316,80 +1195,44 @@ export default function Home() {
               Prekmurje, Slovenija
             </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: "#6f685f" }}>
-              Stran
-            </div>
-            <a href="#o-podjetju" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
+          <div className={styles.footerCol}>
+            <div className={`font-barlow-condensed ${styles.footerLabel}`}>Stran</div>
+            <a href="#o-podjetju" className={`${styles.footerLink} ${styles.footerItem}`}>
               O podjetju
             </a>
-            <a href="#storitve" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
+            <a href="#storitve" className={`${styles.footerLink} ${styles.footerItem}`}>
               Storitve
             </a>
-            <a href="#kontakt" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
+            <a href="#kontakt" className={`${styles.footerLink} ${styles.footerItem}`}>
               Kontakt
             </a>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div className="font-barlow-condensed" style={{ fontSize: 12, letterSpacing: ".22em", textTransform: "uppercase", color: "#6f685f" }}>
-              Kontakt
-            </div>
-            <a href="tel:070799810" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15 }}>
+          <div className={styles.footerCol}>
+            <div className={`font-barlow-condensed ${styles.footerLabel}`}>Kontakt</div>
+            <a href="tel:070799810" className={`${styles.footerLink} ${styles.footerItem}`}>
               070 799 810
             </a>
-            <a href="mailto:info@pg-inzeniring.si" className={styles.footerLink} style={{ color: "#e7e2db", fontSize: 15, wordBreak: "break-word" }}>
+            <a href="mailto:info@pg-inzeniring.si" className={`${styles.footerLink} ${styles.footerItem}`} style={{ wordBreak: "break-word" }}>
               info@pg-inzeniring.si
             </a>
           </div>
         </div>
         <div style={containerStyle}>
-          <div
-            className="font-archivo"
-            style={{
-              fontWeight: 700,
-              fontSize: "clamp(40px,11.6vw,190px)",
-              lineHeight: 0.82,
-              letterSpacing: "-.045em",
-              color: "rgba(255,255,255,.055)",
-              userSelect: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
+          <div className={`font-archivo ${styles.footerWordmark}`} aria-hidden>
             PG INŽENIRING
           </div>
         </div>
         <div style={{ borderTop: "1px solid #2b2620", marginTop: "clamp(22px,3vw,34px)" }}>
-          <div
-            style={{
-              ...containerStyle,
-              paddingTop: 18,
-              paddingBottom: 18,
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 12,
-              justifyContent: "space-between",
-              fontSize: 13,
-              color: "#7d766d",
-            }}
-          >
+          <div className={styles.footerBar} style={containerStyle}>
             <span>© 2026 PG INŽENIRING d.o.o. Vse pravice pridržane.</span>
-            <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
-              <Link href="/politika-zasebnosti" className={styles.footerLink} style={{ color: "#7d766d", fontSize: 13 }}>
+            <div className={styles.footerBarLinks}>
+              <Link href="/politika-zasebnosti" className={`${styles.footerLink} ${styles.footerBarLink}`}>
                 Politika zasebnosti
               </Link>
               <button
                 type="button"
                 onClick={() => window.dispatchEvent(new CustomEvent(OPEN_COOKIE_SETTINGS_EVENT))}
-                className={styles.footerLink}
-                style={{
-                  color: "#7d766d",
-                  fontSize: 13,
-                  background: "none",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                }}
+                className={`${styles.footerLink} ${styles.footerBarLink}`}
               >
                 Nastavitve piškotkov
               </button>

@@ -18,17 +18,77 @@
   .navLinks {
     display: none;
   }
-  .burger {
-    display: flex !important;
-  }
   .headerCta {
     display: none !important;
   }
+
+  /* Quiet two-line icon in a full 44px hit area; lines sit flush with the gutter. */
+  .burger {
+    position: relative;
+    z-index: 71;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 7px;
+    width: 44px;
+    height: 44px;
+    margin-right: -8px;
+    padding: 0 8px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+    transition: color 0.3s ease, opacity 0.2s ease;
+  }
+  .burger[data-solid="true"] {
+    color: #26231f;
+  }
+  .burger:active {
+    opacity: 0.6;
+  }
+  .burger:focus-visible {
+    outline: 1px solid var(--accent);
+    outline-offset: -4px;
+  }
+}
+
+.burgerLine {
+  display: block;
+  width: 24px;
+  height: 1.5px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.burgerLine + .burgerLine {
+  width: 16px;
+}
+
+.burger[data-solid="false"] .burgerLine {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.burger[data-open="true"] .burgerLine {
+  width: 22px;
+  box-shadow: none;
+}
+
+.burger[data-open="true"] .burgerLine:first-child {
+  transform: translateY(4.25px) rotate(45deg);
+}
+
+.burger[data-open="true"] .burgerLine + .burgerLine {
+  transform: translateY(-4.25px) rotate(-45deg);
 }
 
 @media (max-width: 480px) {
+  /* The logo PNG is a square canvas with the mark in its middle ~42%;
+     trim the transparent band so a larger mark doesn't grow the header. */
   .logoImg {
-    width: 52px !important;
+    width: 60px !important;
+    margin: -8px 0;
   }
   .logoLabel {
     display: none;
@@ -54,9 +114,64 @@
   flex: 1 1 auto;
 }
 
+.heroTitle {
+  font-size: clamp(70px, 19.6vw, 406px);
+  line-height: 1.14;
+}
+
 .mobileEyebrow,
 .mobileSubcopy {
   display: none;
+}
+
+/* Mobile hero service index */
+.heroMark {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 2px 4px;
+  text-align: center;
+  color: #fff;
+  transition: opacity 0.2s ease;
+}
+
+.heroMark:active {
+  opacity: 0.65;
+}
+
+.heroMarkNum {
+  font-weight: 600;
+  font-size: clamp(22px, 6.6vw, 28px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.62);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+.heroMarkTitle {
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: clamp(12px, 3.6vw, 14px);
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+.heroMarkRule {
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.heroMarkRule[data-first="true"] {
+  background: var(--accent);
 }
 
 .desktopBottomContent {
@@ -87,6 +202,22 @@
     max-height: 100vh;
     max-height: 100svh;
   }
+  /* Single-line wordmark sized to the column: Bebas "PG INŽENIRING" is ~4.31em
+     wide, so 20.4vw spans the width minus the gutters at every phone size. */
+  .heroTitle {
+    font-size: 20.4vw;
+    line-height: 1.02;
+  }
+}
+
+.stepsInner {
+  padding-top: clamp(72px, 10vw, 140px);
+  padding-bottom: clamp(72px, 10vw, 140px);
+}
+
+.stepsContainer {
+  position: relative;
+  margin-top: clamp(44px, 6vw, 72px);
 }
 
 .stepsTrack {
@@ -203,41 +334,67 @@
 }
 
 @media (max-width: 859px) {
+  .stepsInner {
+    padding-top: clamp(60px, 17vw, 72px);
+    padding-bottom: clamp(60px, 17vw, 72px);
+  }
+  .stepsContainer {
+    margin-top: 32px;
+  }
+  /* Timeline rail: 2px, running from the first dot to the last. */
   .stepsTrack {
-    left: 5px;
+    left: 4.5px;
     right: auto;
-    top: 0;
+    top: 19px;
     bottom: 0;
-    width: 1px;
+    width: 2px;
     height: auto;
+    background: #ece5dc;
   }
   .stepsBar {
-    left: 5px;
-    top: 0;
-    width: 1px;
-    height: 100%;
+    left: 4.5px;
+    top: 19px;
+    width: 2px;
+    height: calc(100% - 19px);
     transform: scaleY(1);
     transform-origin: center top;
   }
   .stepsGrid {
     grid-template-columns: 1fr;
-    gap: clamp(36px, 8vw, 52px);
+    gap: clamp(30px, 9vw, 40px);
   }
   .stepItem {
     display: flex;
     align-items: flex-start;
-    gap: clamp(18px, 4vw, 28px);
+    gap: clamp(18px, 5vw, 26px);
   }
   .stepDot {
     margin-bottom: 0;
-    margin-top: 20px;
+    margin-top: 14px;
   }
+  /* Number and title share a baseline; the description runs beneath. */
   .stepItemBody {
     flex: 1 1 auto;
     min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 14px;
   }
   .stepNum {
-    font-size: clamp(44px, 11vw, 60px);
+    font-size: clamp(44px, 13vw, 54px);
+    line-height: 0.84;
+  }
+  .stepTitle {
+    margin: 0;
+    justify-self: start;
+    font-size: clamp(20px, 5.8vw, 23px);
+  }
+  .stepText {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    max-width: 42ch;
+    line-height: 1.55;
   }
 }
 
@@ -293,6 +450,10 @@
   background: var(--accent-light);
   transform: translate(-50%, 0);
   animation: pgScrollCue 2.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.scrollCueLabel {
+  font-size: 11px;
 }
 
 .scrollCue:hover .scrollCueTrack {
@@ -371,10 +532,36 @@
   justify-content: center;
 }
 
+.aboutLead {
+  margin: 30px 0 0;
+  max-width: 50ch;
+  font-size: clamp(16px, 1.3vw, 19px);
+  line-height: 1.75;
+  color: #5a544c;
+  text-wrap: pretty;
+}
+
 .aboutImageFrame {
   position: relative;
   overflow: hidden;
   aspect-ratio: 4 / 3;
+}
+
+.aboutImageCaption {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aboutImageCaptionText {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
 }
 
 @media (min-width: 900px) {
@@ -466,22 +653,152 @@
   }
 }
 
+@media (max-width: 899px) {
+  .aboutImageCaption {
+    left: var(--page-gutter);
+    right: var(--page-gutter);
+    bottom: 18px;
+  }
+  .aboutImageCaptionText {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 699px) {
+  .aboutGrid {
+    gap: 32px;
+    padding-top: clamp(56px, 15vw, 64px);
+    padding-bottom: clamp(40px, 11vw, 52px);
+  }
+  .aboutLead {
+    margin-top: 22px;
+    font-size: 16px;
+    line-height: 1.65;
+    color: #554f47;
+  }
+  /* Image bleeds to the screen edges for a cinematic break in the text column.
+     (Set on the Reveal wrapper so its clip-path animation includes the bleed.) */
+  .aboutImageReveal {
+    margin-inline: calc(var(--page-gutter) * -1);
+  }
+  .aboutImageFrame {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* Principles: number in a narrow left column, text beside it — an editorial
+     index rather than three tall stacked blocks. */
   .aboutPoints {
     grid-template-columns: minmax(0, 1fr);
     border-top: 0;
     padding-top: 0;
   }
   .aboutPoint {
-    padding: clamp(26px, 7vw, 36px) 0;
+    display: grid;
+    grid-template-columns: clamp(52px, 15vw, 64px) minmax(0, 1fr);
+    column-gap: clamp(12px, 4vw, 20px);
+    align-items: start;
+    padding: 24px 0;
     border-left: 0;
     border-top: 1px solid #e9e2d9;
   }
   .aboutPoints > :first-child .aboutPoint {
-    padding-top: clamp(26px, 7vw, 36px);
+    padding-top: 24px;
+  }
+  .aboutPoints > :last-child .aboutPoint {
+    padding-bottom: 0;
   }
   .aboutPointNum {
-    font-size: clamp(44px, 12vw, 58px);
+    grid-row: 1 / span 3;
+    font-size: clamp(36px, 11vw, 44px);
+    line-height: 0.86;
+    color: #d9cdbc;
+  }
+  .aboutPointTitle {
+    margin: 2px 0 0;
+    font-size: 19px;
+    line-height: 1.2;
+  }
+  .aboutPointRule {
+    width: 24px;
+    margin-top: 12px;
+  }
+  .aboutPointText {
+    margin-top: 12px;
+    max-width: 42ch;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+}
+
+/* Quote / brand statement */
+.quoteOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(14, 11, 8, 0.34) 0%, rgba(14, 11, 8, 0) 22%, rgba(14, 11, 8, 0) 70%, rgba(14, 11, 8, 0.42) 100%),
+    linear-gradient(100deg, rgba(14, 11, 8, 0.86) 0%, rgba(14, 11, 8, 0.7) 34%, rgba(14, 11, 8, 0.36) 64%, rgba(14, 11, 8, 0.12) 100%);
+  pointer-events: none;
+}
+
+.quoteInner {
+  padding-top: clamp(80px, 11vw, 150px);
+  padding-bottom: clamp(80px, 11vw, 150px);
+}
+
+.quoteLabel {
+  font-size: 13px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.quoteText {
+  margin: clamp(22px, 3vw, 34px) 0 0;
+  font-weight: 600;
+  font-size: clamp(26px, 4vw, 52px);
+  line-height: 1.16;
+  letter-spacing: -0.028em;
+  color: #fff;
+  text-wrap: pretty;
+}
+
+.quoteSign {
+  margin-top: clamp(24px, 3vw, 36px);
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+@media (max-width: 699px) {
+  /* Text spans the full width on phones, so the left-weighted wash becomes an
+     even veil with a slightly deeper base — the photo still reads through. */
+  .quoteOverlay {
+    background: linear-gradient(
+      180deg,
+      rgba(14, 11, 8, 0.5) 0%,
+      rgba(14, 11, 8, 0.34) 40%,
+      rgba(14, 11, 8, 0.5) 72%,
+      rgba(14, 11, 8, 0.72) 100%
+    );
+  }
+  .quoteInner {
+    padding-top: clamp(64px, 18vw, 80px);
+    padding-bottom: clamp(64px, 18vw, 80px);
+  }
+  .quoteLabel {
+    color: rgba(255, 255, 255, 0.78);
+  }
+  .quoteText {
+    margin-top: 20px;
+    font-size: clamp(25px, 7.4vw, 32px);
+    line-height: 1.2;
+    letter-spacing: -0.024em;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, 0.35);
+  }
+  .quoteSign {
+    margin-top: 24px;
+    color: rgba(255, 255, 255, 0.7);
   }
 }
 
@@ -501,6 +818,17 @@
   }
 }
 
+/* Below desktop the section flows naturally instead of being locked to one
+   viewport, so the carousel cards keep a cinematic height on short phones. */
+@media (max-width: 899px) {
+  .storitveSection {
+    height: auto;
+    gap: 0;
+    padding-top: calc(var(--header-h, 72px) + 8px);
+    padding-bottom: 8px;
+  }
+}
+
 .storitveIntroWrap {
   flex: 0.5 1 auto;
   min-height: 0;
@@ -508,11 +836,13 @@
   display: flex;
   align-items: center;
   max-height: clamp(160px, 26vh, 320px);
+  padding-inline: clamp(20px, 5vw, 40px);
 }
 
 @media (max-width: 899px) {
   .storitveIntroWrap {
-    max-height: clamp(150px, 30vh, 260px);
+    max-height: none;
+    padding-inline: var(--page-gutter);
   }
 }
 
@@ -532,12 +862,19 @@
   }
 }
 
+.storitveIntroText {
+  margin: 0;
+  max-width: 40ch;
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.6;
+  color: #7d766d;
+  text-wrap: pretty;
+}
+
 @media (max-width: 899px) {
   .storitveIntroText {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-size: 16px;
+    color: #6b645b;
   }
 }
 
@@ -569,7 +906,13 @@
     display: flex;
     flex: 0 0 auto;
     justify-content: center;
-    padding: 14px 0 clamp(14px, 3vw, 20px);
+    padding: 20px 0 clamp(36px, 10vw, 52px);
+  }
+  .storitveCtaMobile a {
+    padding: 12px 4px;
+  }
+  .storitveCtaMobile a:active {
+    opacity: 0.6;
   }
 }
 
@@ -582,7 +925,8 @@
     display: flex;
     flex: 0 0 auto;
     gap: clamp(12px, 4vw, 24px);
-    padding: 0 clamp(20px, 5vw, 40px);
+    margin-top: 28px;
+    padding: 0 var(--page-gutter);
   }
 }
 
@@ -591,11 +935,11 @@
   background: none;
   border: none;
   border-bottom: 2px solid #e9e2d9;
-  padding: 0 0 10px;
+  padding: 8px 0 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 3px;
+  gap: 4px;
   cursor: pointer;
   transition: border-color 0.3s ease;
   flex: 1 1 0;
@@ -605,17 +949,17 @@
 .storitveTabNum {
   font-family: var(--font-archivo), Helvetica, sans-serif;
   font-weight: 700;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.08em;
   color: #cfc7bd;
   transition: color 0.3s ease;
 }
 
 .storitveTabTitle {
-  font-family: var(--font-archivo), Helvetica, sans-serif;
-  font-weight: 700;
-  font-size: clamp(11px, 3.2vw, 13px);
-  letter-spacing: 0.02em;
+  font-family: var(--font-barlow-condensed), var(--font-barlow), sans-serif;
+  font-weight: 600;
+  font-size: clamp(12px, 3.5vw, 14px);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #a09889;
   white-space: nowrap;
@@ -659,6 +1003,31 @@
 
 .storitvePanels::-webkit-scrollbar {
   display: none;
+}
+
+/* Swipe carousel: each card ~88vw, aligned to the page gutter, with the next
+   card peeking in from the right. Native scroll-snap, no JS carousel. */
+@media (max-width: 899px) {
+  .storitvePanelsWrap {
+    flex: 0 0 auto;
+    margin-top: 16px;
+  }
+  .storitvePanels {
+    height: clamp(440px, 128vw, 580px);
+    grid-auto-columns: 88vw;
+    gap: 10px;
+    padding-inline: var(--page-gutter);
+    scroll-padding-inline: var(--page-gutter);
+    overscroll-behavior-x: contain;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+  .storitvePanels {
+    height: 560px;
+    grid-auto-columns: 62vw;
+    gap: 12px;
+  }
 }
 
 @media (min-width: 900px) {
@@ -950,11 +1319,58 @@
 }
 
 @media (max-width: 899px) {
+  .servicePanel {
+    --panel-pad: clamp(20px, 6vw, 28px);
+  }
+  .servicePanelNum {
+    font-size: clamp(34px, 10vw, 44px);
+  }
   .servicePanelTitle {
-    font-size: clamp(26px, 7.4vw, 34px);
+    font-size: clamp(28px, 8.4vw, 38px);
+  }
+  .servicePanelTagline {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  .servicePanelList {
+    gap: 6px;
   }
   .servicePanelList li {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .servicePanelDot {
+    margin-top: 9px;
+  }
+  .servicePanelCtaLabel {
     font-size: 13.5px;
+  }
+
+  /* Cards that aren't the snapped one sit back slightly. */
+  .servicePanel[data-active="false"] .servicePanelOverlay::after {
+    opacity: 0.7;
+  }
+}
+
+/* Touch: no hover to reveal the CTA, so it rests in its accent state and the
+   card gives a short press response instead. */
+@media (hover: none) {
+  .servicePanelCtaLabel::before {
+    background: var(--accent);
+  }
+  .servicePanelImg {
+    transition-duration: 0.5s;
+  }
+  .servicePanel:active .servicePanelImg {
+    transform: scale(1.025);
+  }
+  .servicePanel:active .servicePanelOverlay::after {
+    opacity: 1;
+    transition-duration: 0.2s;
+  }
+  .servicePanel:active .ctaArrow {
+    transform: translateX(6px);
   }
 }
 
@@ -986,11 +1402,245 @@
   color: var(--accent-light);
 }
 
+.footerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: clamp(30px, 4vw, 60px);
+  align-items: start;
+  padding-top: clamp(56px, 7vw, 96px);
+  padding-bottom: clamp(32px, 4vw, 48px);
+}
+
+.footerCol {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footerLabel {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #6f685f;
+}
+
+.footerItem {
+  color: #e7e2db;
+  font-size: 15px;
+}
+
+.footerWordmark {
+  font-weight: 700;
+  font-size: clamp(40px, 11.6vw, 190px);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  color: rgba(255, 255, 255, 0.055);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.footerBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  padding-top: 18px;
+  padding-bottom: 18px;
+  font-size: 13px;
+  color: #7d766d;
+}
+
+.footerBarLinks {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.footerBarLink {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: #7d766d;
+  cursor: pointer;
+}
+
+.footerItem:hover,
+.footerItem:active,
+.footerBarLink:hover,
+.footerBarLink:active {
+  color: var(--accent-light);
+}
+
+/* Tablet / touch widths: same look, taller hit areas (padding replaces the gap). */
+@media (max-width: 899px) {
+  .footerCol {
+    gap: 2px;
+  }
+  .footerLabel {
+    margin-bottom: 6px;
+  }
+  .footerItem {
+    align-self: flex-start;
+    padding: 9px 0;
+  }
+  .footerBarLink {
+    padding: 11px 0;
+  }
+  .scrollCueLabel {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 599px) {
+  .footerGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 36px 20px;
+    padding-top: 56px;
+    padding-bottom: 36px;
+  }
+  .footerBrand {
+    grid-column: 1 / -1;
+  }
+  .footerLabel {
+    font-size: 12.5px;
+    color: #857d72;
+  }
+  .footerItem {
+    font-size: 16px;
+  }
+  /* Wordmark is ~7.13em wide: size it to the content column so it spans
+     edge to edge without clipping. */
+  .footerWordmark {
+    font-size: calc((100vw - 2 * var(--page-gutter)) / 7.2);
+    color: rgba(255, 255, 255, 0.07);
+  }
+  .footerBar {
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 22px;
+    padding-bottom: max(26px, env(safe-area-inset-bottom));
+    font-size: 13px;
+    color: #8f877c;
+  }
+  .footerBarLinks {
+    gap: 0 22px;
+    order: 1;
+  }
+  .footerBarLink {
+    font-size: 14px;
+    color: #a39b90;
+  }
+}
+
 .contactGrid {
   display: grid;
   grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   gap: clamp(48px, 6vw, 112px);
   align-items: start;
+  padding-top: clamp(64px, 9vw, 120px);
+  padding-bottom: clamp(64px, 9vw, 120px);
+}
+
+.contactRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 2px;
+  border-top: 1px solid #e9e2d9;
+  color: #26231f;
+}
+
+.contactRowLast {
+  border-bottom: 1px solid #e9e2d9;
+}
+
+.contactRowLabel {
+  flex-shrink: 0;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a09889;
+}
+
+.contactRowValue {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.contactRowPhone {
+  font-size: clamp(18px, 1.7vw, 23px);
+}
+
+.contactRowEmail {
+  font-size: clamp(16px, 1.5vw, 21px);
+  word-break: break-word;
+}
+
+.contactRowAddress {
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: right;
+  color: #4a453f;
+}
+
+.contactMobileCta {
+  display: none;
+}
+
+/* Phones: label above value, left-aligned — a clear vertical directory —
+   followed by a full-width accent CTA into the form. */
+@media (max-width: 599px) {
+  .contactRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 16px 0;
+  }
+  .contactRowLabel {
+    font-size: 12.5px;
+  }
+  .contactRowPhone {
+    font-size: 24px;
+  }
+  .contactRowEmail {
+    font-size: 19px;
+  }
+  .contactRowAddress {
+    text-align: left;
+    color: #26231f;
+  }
+  .contactLine:hover {
+    padding-left: 0;
+  }
+  .contactLine:active {
+    color: var(--accent);
+  }
+  .contactMobileCta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+    padding: 18px 22px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background 0.25s ease;
+  }
+  .contactMobileCta:hover,
+  .contactMobileCta:active {
+    background: var(--accent-dark);
+    color: #fff;
+  }
+  .contactMobileCta:active .formSubmitArrow {
+    transform: translateX(5px);
+  }
 }
 
 .contactFormCol {
@@ -1161,6 +1811,22 @@
     padding-top: clamp(36px, 8vw, 52px);
     border-left: 0;
     border-top: 1px solid #e9e2d9;
+    scroll-margin-top: calc(var(--header-h, 72px) + 8px);
+  }
+}
+
+@media (max-width: 599px) {
+  .contactGrid {
+    gap: 48px;
+    padding-top: clamp(56px, 15vw, 64px);
+    padding-bottom: clamp(56px, 15vw, 64px);
+  }
+  .contactForm {
+    row-gap: 24px;
+    margin-top: 28px;
+  }
+  .fieldInput {
+    padding: 10px 0 12px;
   }
 }
 
@@ -1171,6 +1837,14 @@
   .formSubmit {
     width: 100%;
     justify-content: space-between;
+    padding: 19px 22px;
+    font-size: 14px;
+  }
+  .formSubmit:active {
+    background: var(--accent-dark);
+  }
+  .formNote {
+    max-width: none;
   }
 }
 
@@ -1181,7 +1855,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 96px 24px 32px;
+  padding: 96px var(--page-gutter) max(32px, env(safe-area-inset-bottom));
   background: #14110e;
   visibility: hidden;
   opacity: 0;
@@ -1215,16 +1889,23 @@
   display: flex;
   align-items: baseline;
   gap: 18px;
-  padding: 16px 2px;
+  padding: clamp(14px, 4vw, 18px) 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   font-family: var(--font-archivo), sans-serif;
   font-weight: 700;
   font-size: clamp(28px, 9vw, 42px);
-  letter-spacing: -0.01em;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
   text-transform: uppercase;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease;
+  transform: translateY(14px);
+  transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease,
+    padding-left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobileMenuLink:active {
+  padding-left: 6px;
+  color: var(--accent-light) !important;
 }
 
 .mobileMenuOpen .mobileMenuLink {
@@ -1233,9 +1914,11 @@
 }
 
 .mobileMenuLinkNum {
+  min-width: 1.6em;
   font-size: 13px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.38);
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .mobileMenuFooter {
@@ -1269,7 +1952,8 @@
   transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
 }
 
-.mobileMenuCta:hover {
+.mobileMenuCta:hover,
+.mobileMenuCta:active {
   border-color: var(--accent);
   color: var(--accent-light);
   background: rgba(255, 255, 255, 0.06);
@@ -1278,14 +1962,20 @@
 .mobileMenuContact {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.6);
+  gap: 2px;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .mobileMenuContact a {
+  align-self: flex-start;
+  padding: 8px 0;
   color: inherit;
   transition: color 0.3s ease;
+}
+
+.mobileMenuContact a:active {
+  color: var(--accent-light);
 }
 
 .mobileMenuContact a:hover {

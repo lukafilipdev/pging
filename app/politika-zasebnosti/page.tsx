@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Politika zasebnosti | PG INŽENIRING d.o.o.",
@@ -33,7 +34,7 @@ export default function PolitikaZasebnostiPage() {
       <header style={{ borderBottom: "1px solid #ece6dd" }}>
         <div style={{ ...containerStyle, paddingTop: 24, paddingBottom: 24 }}>
           <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
-            <img src="/uploads/logo.png" alt="PG Inženiring" style={{ width: 60, height: "auto" }} />
+            <Image src="/uploads/logo.png" alt="PG Inženiring" width={60} height={60} preload style={{ width: 60, height: "auto" }} />
           </Link>
         </div>
       </header>
